@@ -28,7 +28,6 @@ cell_names$V1 <- colData(filtered_sce_raw)$V1
 mat_filtered_zero <- counts(filtered_sce_raw)
 
 scae <- read_allele_counts(example_data_5k$dir,
-                           sample_names="example_data_wta",
                            filter_mode="custom",
                            lookup_file=lookup,
                            barcode_file=example_data_5k$barcodes,
@@ -82,38 +81,38 @@ test_that("check input-parameter errors", {
 
   #Testing for the error message of the filter_mode="custom" mode if threshold is not set
   expect_error(read_allele_counts(example_data_5k$dir,
-                                sample_names="example_data_wta",
-                                filter_mode="custom",
-                                lookup_file=lookup,
-                                barcode_file=example_data_5k$barcodes,
-                                gene_file=example_data_5k$features,
-                                matrix_file=example_data_5k$matrix,
-                                filter_threshold=NULL,
-                                verbose=FALSE),
-            regexp = "")
-
-  #Testing for the correct output message of the filter_mode="yes" mode
-  expect_message(read_allele_counts(example_data_5k$dir,
                                   sample_names="example_data_wta",
-                                  filter_mode="yes",
+                                  filter_mode="custom",
                                   lookup_file=lookup,
                                   barcode_file=example_data_5k$barcodes,
                                   gene_file=example_data_5k$features,
                                   matrix_file=example_data_5k$matrix,
                                   filter_threshold=NULL,
                                   verbose=FALSE),
+               regexp = "")
+
+  #Testing for the correct output message of the filter_mode="yes" mode
+  expect_message(read_allele_counts(example_data_5k$dir,
+                                    sample_names="example_data_wta",
+                                    filter_mode="yes",
+                                    lookup_file=lookup,
+                                    barcode_file=example_data_5k$barcodes,
+                                    gene_file=example_data_5k$features,
+                                    matrix_file=example_data_5k$matrix,
+                                    filter_threshold=NULL,
+                                    verbose=FALSE),
                  regexp = "Filtering performed based on the inflection point at: 282 UMI counts.")
 
   #Testing for the correct output message of the filter_mode="no" mode
   expect_message(read_allele_counts(example_data_5k$dir,
-                                  sample_names="example_data_wta",
-                                  filter_mode="no",
-                                  lookup_file=lookup,
-                                  barcode_file=example_data_5k$barcodes,
-                                  gene_file=example_data_5k$features,
-                                  matrix_file=example_data_5k$matrix,
-                                  filter_threshold=NULL,
-                                  verbose=FALSE),
+                                    sample_names="example_data_wta",
+                                    filter_mode="no",
+                                    lookup_file=lookup,
+                                    barcode_file=example_data_5k$barcodes,
+                                    gene_file=example_data_5k$features,
+                                    matrix_file=example_data_5k$matrix,
+                                    filter_threshold=NULL,
+                                    verbose=FALSE),
                  regexp = "Suggested threshold based on inflection point is at: 282 UMI counts.")
 
 })
@@ -121,27 +120,17 @@ test_that("check input-parameter errors", {
 
 test_that("check rowData extension for WTA and Amplicon", {
 
- expect_equal(colnames(rowData(scae))[1], "Ensembl_ID")
+  expect_equal(colnames(rowData(scae))[1], "Ensembl_ID")
 
- expect_equal(colnames(rowData(scae))[2], "Symbol")
+  expect_equal(colnames(rowData(scae))[2], "Symbol")
 
- expect_equal(colnames(rowData(scae))[3], "NI_I")
+  expect_equal(colnames(rowData(scae))[3], "NI_I")
 
- expect_equal(colnames(rowData(scae))[4], "Quant_type")
+  expect_equal(colnames(rowData(scae))[4], "Quant_type")
 
 })
 
-
 test_that("sample_names and samples_dir", {
 
-  scae_no_sample <- read_allele_counts(example_data_5k$dir,
-                               filter_mode="custom",
-                               lookup_file=lookup,
-                               barcode_file=example_data_5k$barcodes,
-                               gene_file=example_data_5k$features,
-                               matrix_file=example_data_5k$matrix,
-                               filter_threshold=0,
-                               verbose=TRUE)
-
-  expect_equal(colData(scae_no_sample)$Sample[1], example_data_5k$dir)
+  expect_equal(colData(scae)$Sample[1], example_data_5k$dir)
 })
