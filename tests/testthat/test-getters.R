@@ -59,4 +59,3 @@ test_that("test wrapper getter", {
                  regexp="Invalid layer specified, Choose from `nonimmune`, `alleles`, `immune_genes`, `functional_groups`")
 
 })
-
