@@ -1,16 +1,7 @@
 
 #---------SingleCellAlleleExperiment class definition and constructor----------#
 
-#' SingleCellAlleleExperiment class definition
-#'
-#' @description
-#' Defining the `SingleCellAlleleExperiment` class derived from `SingleCellExperiment` class.
-#'
-#' @importFrom methods new
-#' @importClassesFrom SingleCellExperiment SingleCellExperiment
-#'
-#' @return definition for the scae class
-.scae <- setClass("SingleCellAlleleExperiment", contains = "SingleCellExperiment")
+
 
 #' Constructor SingleCellAlleleExperiment class
 #'
@@ -31,9 +22,11 @@
 #' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
 #'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
-#' @importFrom SingleCellExperiment SingleCellExperiment sizeFactors counts logcounts counts<- logcounts<-
-#' @importFrom SummarizedExperiment assays<- assays
+#' @importFrom SingleCellExperiment SingleCellExperiment sizeFactors counts 
+#' logcounts counts<- logcounts<-
+#' @importFrom SummarizedExperiment assays<- assays metadata<-
 #' @importFrom DelayedArray DelayedArray
+#' @importFrom methods new
 #'
 #' @return A SingleCellAlleleExperiment object.
 SingleCellAlleleExperiment <- function(..., lookup, metadata=NULL, threshold=0,
@@ -89,7 +82,10 @@ SingleCellAlleleExperiment <- function(..., lookup, metadata=NULL, threshold=0,
 
   counts(scae) <- DelayedArray::DelayedArray(counts(scae))
   metadata(scae)[["knee_info"]] <- metadata
-  .scae(scae)
+  
+  scae <- new("SingleCellAlleleExperiment", scae)
+  
+  return(scae)
 }
 
 
