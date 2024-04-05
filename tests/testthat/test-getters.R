@@ -3,7 +3,9 @@ library(SingleCellAlleleExperiment)
 library(scaeData)
 
 example_data_5k <- scaeData::scaeDataGet(dataset="pbmc_5k")
-lookup <- utils::read.csv(system.file("extdata", "pbmc_5k_lookup_table.csv", package="scaeData"))
+lookup <- utils::read.csv(system.file("extdata",
+                                      "pbmc_5k_lookup_table.csv",
+                                      package="scaeData"))
 
 scae <- read_allele_counts(example_data_5k$dir,
                            sample_names="example_data_wta",
@@ -15,40 +17,35 @@ scae <- read_allele_counts(example_data_5k$dir,
                            filter_threshold=0,
                            verbose=TRUE)
 
-
 # non_immune genes layer
 test_that("non-immune genes getter", {
-
-  expect_equal(get_nigenes(scae), scae[grepl("ENSG", rownames(counts(scae)), fixed=TRUE),])
-
+  rn_counts_sce <- rownames(counts(scae))
+  expect_equal(get_nigenes(scae),
+               scae[grepl("ENSG", rn_counts_sce, fixed=TRUE),])
 })
 
 # alleles layer
 test_that("alleles getter", {
-
-  expect_equal(scae_subset_alleles(scae), scae[grepl("*", rownames(counts(scae)), fixed=TRUE),])
-
+  rn_counts_sce <- rownames(counts(scae))
+  expect_equal(scae_subset_alleles(scae),
+               scae[grepl("*", rn_counts_sce, fixed=TRUE),])
 })
-
 
 # immune gene layer
 test_that("immune genes getter", {
-
-  expect_equal(get_agenes(scae), scae[grepl("HLA-", rownames(counts(scae)), fixed=TRUE),])
-
+  rn_counts_sce <- rownames(counts(scae))
+  expect_equal(get_agenes(scae),
+               scae[grepl("HLA-", rn_counts_sce, fixed=TRUE),])
 })
-
 
 # functional class layer
 test_that("functional class getter", {
-
-  expect_equal(scae_subset_functional(scae), scae[grepl("class", rownames(counts(scae)), fixed=TRUE),])
-
+  rn_counts_sce <- rownames(counts(scae))
+  expect_equal(scae_subset_functional(scae),
+               scae[grepl("class", rn_counts_sce, fixed=TRUE),])
 })
 
-
 test_that("test wrapper getter", {
-
   #nonimmune
   expect_equal(scae_subset(scae, "nonimmune"), get_nigenes(scae))
   #allele

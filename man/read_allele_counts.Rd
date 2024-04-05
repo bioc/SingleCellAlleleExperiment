@@ -7,12 +7,14 @@
 read_allele_counts(
   samples_dir,
   sample_names = names(samples_dir),
-  filter_mode = c("yes", "no", "custom"),
+  filter_mode = c("no", "yes", "custom"),
   lookup_file = lookup,
   barcode_file = "cells_x_genes.barcodes.txt",
   gene_file = "cells_x_genes.genes.txt",
   matrix_file = "cells_x_genes.mtx",
   filter_threshold = NULL,
+  log = FALSE,
+  gene_symbols = FALSE,
   verbose = FALSE,
   BPPARAM = BiocParallel::SerialParam()
 )
@@ -34,6 +36,10 @@ The value \code{"no"} computes the knee plot and stops function execution. This 
 \item{matrix_file}{A character string determining the name of the file containing the count matrix.}
 
 \item{filter_threshold}{An integer value used as a threshold for filtering low-quality barcodes/cells. Standard value is \code{NULL} when using \code{filter = c("yes", "no")}. Value must be provided when using \code{filter = "custom"}.}
+
+\item{log}{A logical parameter to decide if logcounts assay should be computed based on library factors computed with \code{scuttle::computeLibraryFactors()}.}
+
+\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.}
 
 \item{verbose}{A logical parameter to decide if runtime-messages should be shown during function execution. Use \code{FALSE} if no info runtime-messages should be shown (default), and \code{TRUE} for showing runtime-messages.}
 
@@ -99,6 +105,4 @@ scae_preflight <- read_allele_counts(example_data_5k$dir,
 #                         filter_threshold=200)
 
 # scae_custom_filter
-
-
 }

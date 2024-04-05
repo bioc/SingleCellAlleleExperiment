@@ -4,16 +4,31 @@
 \alias{SingleCellAlleleExperiment}
 \title{Constructor SingleCellAlleleExperiment class}
 \usage{
-SingleCellAlleleExperiment(..., threshold, exp_type, lookup, verbose = FALSE)
+SingleCellAlleleExperiment(
+  ...,
+  lookup,
+  metadata = NULL,
+  threshold = 0,
+  exp_type = "ENS",
+  log = FALSE,
+  gene_symbols = FALSE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{...}{Arguments passed to the \code{\link{SingleCellExperiment}} constructor to fill the slots of the SCE-class.}
+
+\item{lookup}{A data.frame object containing the lookup table.}
+
+\item{metadata}{potential information regarding plotting a knee plot for quality control.}
 
 \item{threshold}{An integer value used as a threshold for filtering low-quality barcodes/cells.}
 
 \item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
 
-\item{lookup}{A data.frame object containing the lookup table.}
+\item{log}{binary if user wants to compute \code{logcounts} assay.}
+
+\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.}
 
 \item{verbose}{A logical parameter to decide if runtime-messages should be shown during function execution.
 Use \code{FALSE} if no info runtime-messages should be shown (default), and \code{TRUE} for showing runtime-messages.}

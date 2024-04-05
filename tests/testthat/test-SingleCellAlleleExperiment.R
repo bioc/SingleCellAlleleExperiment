@@ -4,7 +4,9 @@ library(scaeData)
 library(Matrix)
 #--------------------read in raw data and objects for tests--------------------#
 example_data_5k <- scaeData::scaeDataGet(dataset="pbmc_5k")
-lookup <- utils::read.csv(system.file("extdata", "pbmc_5k_lookup_table.csv", package="scaeData"))
+lookup <- utils::read.csv(system.file("extdata",
+                                      "pbmc_5k_lookup_table.csv",
+                                      package="scaeData"))
 
 barcode_loc <- file.path(example_data_5k$dir, example_data_5k$barcodes)
 feature_loc <- file.path(example_data_5k$dir, example_data_5k$features)
@@ -34,35 +36,48 @@ scae <- read_allele_counts(example_data_5k$dir,
                            gene_file=example_data_5k$features,
                            matrix_file=example_data_5k$matrix,
                            filter_threshold=0,
+                           gene_symbols=TRUE,
                            verbose=TRUE)
 
 
 test_that("rownames and rowData check", {
+
+  rn_ni_genes <- rownames(get_nigenes(scae))
+  rn_alleles <- rownames(scae_subset_alleles(scae))
   #check the names
-  expect_equal(feature_info$V1, rownames(rowData(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])))
+  expect_equal(feature_info$V1,
+               rownames(rowData(scae[c(rn_ni_genes, rn_alleles),])))
 
   #check if roWData and object rownames are equal
-  expect_equal(rownames(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),]), rownames(rowData(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])))
+  expect_equal(rownames(scae[c(rn_ni_genes, rn_alleles),]),
+               rownames(rowData(scae[c(rn_ni_genes, rn_alleles),])))
 
   #check the dimension
-  expect_equal(length(feature_info$V1), length(rownames(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])))
+  expect_equal(length(feature_info$V1),
+               length(rownames(scae[c(rn_ni_genes, rn_alleles),])))
 
 })
 
 test_that("colnames and colData check", {
   #check the names
+  rn_ni_genes <- rownames(get_nigenes(scae))
+  rn_alleles <- rownames(scae_subset_alleles(scae))
+
   expect_equal(rownames(colData(scae)), cell_names$V1)
 
   #check if colData and object colnames are equal
-  expect_equal(colnames(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),]), rownames(colData(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])))
+  expect_equal(colnames(scae[c(rn_ni_genes, rn_alleles),]),
+               rownames(colData(scae[c(rn_ni_genes, rn_alleles),])))
 
   #check the dimension
-  expect_equal(length(colnames(scae[c(rownames(get_nigenes(scae)), rownames(scae_subset_alleles(scae))),])), length(cell_names$V1))
+  expect_equal(length(colnames(scae[c(rn_ni_genes, rn_alleles),])),
+               length(cell_names$V1))
 })
 
 test_that("assay check", {
   #dim-check
-  expect_equal(dim(counts(scae)[1:dim(mat_filtered_zero)[1],]), dim(mat_filtered_zero))
+  expect_equal(dim(counts(scae)[1:dim(mat_filtered_zero)[1],]),
+               dim(mat_filtered_zero))
 
   scae_no_immune_layers <- scae[1:dim(mat_filtered_zero)[1],]
 
@@ -70,7 +85,8 @@ test_that("assay check", {
   random_num2 <- sample(1:dim(mat_filtered_zero)[2], 1)
 
   #check random if random entry is equal
-  expect_equal(counts(scae_no_immune_layers)[random_num1, random_num2], mat_filtered_zero[random_num1, random_num2])
+  expect_equal(counts(scae_no_immune_layers)[random_num1, random_num2],
+               mat_filtered_zero[random_num1, random_num2])
 
   expect_type(scae[random_num1, random_num2], "S4")
 })
@@ -92,16 +108,33 @@ test_that("check input-parameter errors", {
                regexp = "")
 
   #Testing for the correct output message of the filter_mode="yes" mode
-  expect_message(read_allele_counts(example_data_5k$dir,
-                                    sample_names="example_data_wta",
-                                    filter_mode="yes",
-                                    lookup_file=lookup,
-                                    barcode_file=example_data_5k$barcodes,
-                                    gene_file=example_data_5k$features,
-                                    matrix_file=example_data_5k$matrix,
-                                    filter_threshold=NULL,
-                                    verbose=FALSE),
-                 regexp = "Filtering performed based on the inflection point at: 282 UMI counts.")
+
+  if (!requireNamespace("DropletUtils", quietly=TRUE)) {
+    expect_error(read_allele_counts(example_data_5k$dir,
+                                      sample_names="example_data_wta",
+                                      filter_mode="yes",
+                                      lookup_file=lookup,
+                                      barcode_file=example_data_5k$barcodes,
+                                      gene_file=example_data_5k$features,
+                                      matrix_file=example_data_5k$matrix,
+                                      filter_threshold=NULL,
+                                      verbose=FALSE),
+    regexp = "")
+  }else {
+    expect_message(read_allele_counts(example_data_5k$dir,
+                                      sample_names="example_data_wta",
+                                      filter_mode="yes",
+                                      lookup_file=lookup,
+                                      barcode_file=example_data_5k$barcodes,
+                                      gene_file=example_data_5k$features,
+                                      matrix_file=example_data_5k$matrix,
+                                      filter_threshold=NULL,
+                                      verbose=FALSE),
+    regexp = "Filtering performed based on the inflection point at: 282 UMI counts.")
+  }
+
+
+
 
   #Testing for the correct output message of the filter_mode="no" mode
   expect_message(read_allele_counts(example_data_5k$dir,
@@ -113,20 +146,19 @@ test_that("check input-parameter errors", {
                                     matrix_file=example_data_5k$matrix,
                                     filter_threshold=NULL,
                                     verbose=FALSE),
-                 regexp = "Suggested threshold based on inflection point is at: 282 UMI counts.")
+               regexp = "Filtering performed on default value at 0 UMI counts.")
 
 })
-
 
 test_that("check rowData extension for WTA and Amplicon", {
 
   expect_equal(colnames(rowData(scae))[1], "Ensembl_ID")
 
-  expect_equal(colnames(rowData(scae))[2], "Symbol")
+  expect_equal(colnames(rowData(scae))[2], "NI_I")
 
-  expect_equal(colnames(rowData(scae))[3], "NI_I")
+  expect_equal(colnames(rowData(scae))[3], "Quant_type")
 
-  expect_equal(colnames(rowData(scae))[4], "Quant_type")
+  expect_equal(colnames(rowData(scae))[4], "Symbol")
 
 })
 

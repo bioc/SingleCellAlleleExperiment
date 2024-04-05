@@ -1,3 +1,11 @@
+
+ Removed multiple dependencies, now listed as suggested
+ - computation of the logcounts assay now optional
+ - computation of a knee plot and according inflection/knee points now optional
+ - computation of new gene-symbols now optional
+ 
+ - minor changes in tests (needs to be extended to test for new optional code)
+ 
 # SingleCellAlleleExperiment 0.99.3
 
 - retriggering bioc build during package submission.

@@ -26,6 +26,8 @@
 #' @param gene_file A character string determining the name of the file containing the feature identifiers.
 #' @param matrix_file A character string determining the name of the file containing the count matrix.
 #' @param filter_threshold An integer value used as a threshold for filtering low-quality barcodes/cells. Standard value is `NULL` when using `filter = c("yes", "no")`. Value must be provided when using `filter = "custom"`.
+#' @param log A logical parameter to decide if logcounts assay should be computed based on library factors computed with `scuttle::computeLibraryFactors()`.
+#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
 #' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution. Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
 #' @importFrom BiocParallel SerialParam bplapply
@@ -77,27 +79,49 @@
 #' #                         filter_threshold=200)
 #'
 #' # scae_custom_filter
-#'
-#'
 #' @export
 read_allele_counts <- function(samples_dir,
                                sample_names=names(samples_dir),
-                               filter_mode=c("yes", "no", "custom"),
-                               lookup_file= lookup,
+                               filter_mode=c("no", "yes", "custom"),
+                               lookup_file=lookup,
                                barcode_file="cells_x_genes.barcodes.txt",
                                gene_file="cells_x_genes.genes.txt",
                                matrix_file="cells_x_genes.mtx",
                                filter_threshold=NULL,
+                               log=FALSE,
+                               gene_symbols=FALSE,
                                verbose=FALSE,
                                BPPARAM=BiocParallel::SerialParam()){
 
-  rt_one_readin_start <- Sys.time()
+  if (filter_mode == "yes"){
+    if (!requireNamespace("DropletUtils", quietly=TRUE)) {
+      stop("Package 'DropletUtils' needed when using 'filter_mode=\"yes\"'.
+           Install using BiocManager::install(\"DropletUtils\")")
+    }
+  }
+
+  if (log){
+    if (!requireNamespace("scuttle", quietly=TRUE)) {
+      stop("Package 'scuttle' needed when using 'log=TRUE'.
+         Install with BiocManager::install(\"scuttle\")")
+    }
+  }
+
+  if (gene_symbols){
+    if (!requireNamespace("org.Hs.eg.db", quietly=TRUE)) {
+      stop("Packages 'org.Hs.eg.db', 'AnnotationDbi' needed when using 'gene_symbols=TRUE'.
+          Install with BiocManager::install(\"org.Hs.eg.db\"),
+          BiocManager::install(\"AnnotationDbi\")")
+    }
+  }
+
   if (is.null(sample_names)) {
     sample_names <- samples_dir
   }
 
   if (filter_mode == "custom" & is.null(filter_threshold)) {
-    stop("For custom filtering you need to state a integer value >0 in the 'filter_threshold' parameter.")
+    stop("For custom filtering you need to state a integer value >0
+         in the 'filter_threshold' parameter.")
   }
 
   #reading in files
@@ -116,7 +140,7 @@ read_allele_counts <- function(samples_dir,
 
   #prepare colData
   cell_info_list <- S4Vectors::DataFrame(Sample=rep(sample_names,
-                                         length(cell_names)),
+                                                    length(cell_names)),
                                          Barcode=cell_names$V1,
                                          row.names=NULL)
   #prepare rowData
@@ -127,48 +151,35 @@ read_allele_counts <- function(samples_dir,
 
   full_data <- as(full_data, "CsparseMatrix")
 
-  #save lookup table
   lookup <- lookup_file
+  inflection_threshold <- 0
+  knee_list <- NULL
 
-  #preflight mode, only for plotting the knee plot
-  if (filter_mode == "no"){
-    inflection_threshold <- plot_knee(full_data, feature_info, cell_names)
-    message("Suggested threshold based on inflection point is at: ", inflection_threshold, " UMI counts.")
-    return()
-  }
-
-  #filtering on the inflection point shown in the advanced knee plot
-  if (filter_mode == "yes"){
-    inflection_threshold <- plot_knee(full_data, feature_info, cell_names)
-    message("Filtering performed based on the inflection point at: ", inflection_threshold, " UMI counts.")
-  }
-
-  #putting a custom filter threshold
-  if (filter_mode == "custom"){
-    inflection_threshold <- filter_threshold
-  }
+  switch(filter_mode,
+         "no"=message("Filtering performed on default value at 0 UMI counts."),
+         "yes"={knee_list <- get_knee_info(full_data, feature_info, cell_names)
+               inflection_threshold <- knee_list$inflection_point
+               message("Filtering performed based on the inflection point at: ",
+               inflection_threshold, " UMI counts.")},
+         "custom"=inflection_threshold <- filter_threshold)
 
   if (verbose){
-    rt_one_readin_end <- Sys.time()
-    diff_rt_one <- round(rt_one_readin_end - rt_one_readin_start, digits=2)
-    message("Runtime check (1/2) Read_in: ",      diff_rt_one, " seconds")
+    message("Data Read_in completed")
   }
 
-  rt_two_scae_start <- Sys.time()
   sce <- SingleCellAlleleExperiment(assays=list(counts=full_data),
                                     rowData=feature_info,
                                     colData=cell_info_list,
+                                    metadata=knee_list,
                                     threshold=inflection_threshold,
                                     exp_type=exp_type,
                                     lookup=lookup,
+                                    log=log,
+                                    gene_symbols=gene_symbols,
                                     verbose=verbose)
 
   if (verbose){
-    rt_two_scae_end <- Sys.time()
-    diff_rt_two <- round(rt_two_scae_end - rt_two_scae_start, digits = 2)
-    message("Runtime check (2/2) Generating SCAE completed: ",    diff_rt_two, " seconds")
-    diff_rt_total <- rt_two_scae_end - rt_one_readin_start
-    message("Total runtime, completed read_in, filtering and normalization and generating scae object ",       ceiling(diff_rt_total), " seconds")
+    message("SingleCellAlleleExperiment object completed")
   }
 
   return(sce)
