@@ -1,7 +1,6 @@
 
 #-----------------------------read_allele_counts-------------------------------#
 
-#####
 #' Reading in allele quantification data into SingleCellAlleleExperiment object
 #'
 #' @description

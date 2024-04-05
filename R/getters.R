@@ -21,7 +21,6 @@ scae_subset_alleles <- function(scae) {
   return(alleles)
 }
 
-
 #' Get immune gene rows
 #'
 #' @description
@@ -41,7 +40,6 @@ get_agenes <- function(scae) {
   agenes <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "G", ]
   return(agenes)
 }
-
 
 #' Get non-immune rows
 #'
@@ -63,7 +61,6 @@ get_nigenes <- function(scae) {
   return(agenes)
 }
 
-
 #' Get functional class rows
 #'
 #' @description
@@ -83,7 +80,6 @@ scae_subset_functional <- function(scae) {
   func <- scae[subset_rows & rowData(scae)$NI_I == "I" & rowData(scae)$Quant_type == "F", ]
   return(func)
 }
-
 
 #------------------------------getter wrapper----------------------------------#
 
