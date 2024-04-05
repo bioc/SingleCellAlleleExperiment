@@ -88,7 +88,7 @@ SingleCellAlleleExperiment <- function(..., lookup, metadata=NULL, threshold=0,
   }
 
   counts(scae) <- DelayedArray::DelayedArray(counts(scae))
-  scae$metadata$knee_info <- metadata
+  metadata(scae)[["knee_info"]] <- metadata
   .scae(scae)
 }
 
