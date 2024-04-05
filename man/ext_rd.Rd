@@ -4,12 +4,14 @@
 \alias{ext_rd}
 \title{Extending rowData}
 \usage{
-ext_rd(sce, exp_type, verbose = FALSE)
+ext_rd(sce, exp_type, gene_symbols, verbose = FALSE)
 }
 \arguments{
 \item{sce}{A \code{\link{SingleCellExperiment}} object. Object is initially constructed in the \code{SingleCellAlleleExperiment} constructor.}
 
 \item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
+
+\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.}
 
 \item{verbose}{A logical parameter to decide if runtime-messages should be shown during function execution.
 Use \code{FALSE} if no info runtime-messages should be shown (default), and \code{TRUE} for showing runtime-messages.}

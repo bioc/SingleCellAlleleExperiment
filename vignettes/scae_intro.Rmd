@@ -422,6 +422,14 @@ List of results from the performed reduced dimension analysis.
 reducedDimNames(scae)
 ```
 
+
+## Visualization
+
+Exemplary visualization for the t-SNE results on gene level for immune genes that relate to HLA-class I. In the given dataset, it is the immune genes `HLA-DRB1`, plotted alongside their alleles. This allows for insights into potential genetic differences shown on allele-level.
+
+
+<hr>
+
 ### HLA-A immune gene and alleles
 
 ```{r fig3, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
@@ -434,13 +442,6 @@ tsne_g_a2 <- plotReducedDim(scae, dimred=which_tsne, colour_by="DRB1*13:01:01") 
 p2 <- tsne_g_a + tsne_g_a1 + tsne_g_a2
 p2
 ```
-
-<hr>
-
-## Visualization
-
-Exemplary visualization for the t-SNE results on gene level for immune genes that relate to HLA-class I. In the given dataset, these are the immune genes `HLA-A`, `HLA-B` and `HLA-C` plotted alongside their alleles. This allows for insights into potential genetic differences shown on allele-level.
-
 
 <hr>
 

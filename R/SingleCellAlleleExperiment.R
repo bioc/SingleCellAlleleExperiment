@@ -23,62 +23,72 @@
 #'
 #' @param ... Arguments passed to the \code{\link{SingleCellExperiment}} constructor to fill the slots of the SCE-class.
 #' @param lookup A data.frame object containing the lookup table.
+#' @param metadata potential information regarding plotting a knee plot for quality control.
 #' @param threshold An integer value used as a threshold for filtering low-quality barcodes/cells.
 #' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
+#' @param log binary if user wants to compute `logcounts` assay.
+#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
 #' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
 #'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
-#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom SingleCellExperiment SingleCellExperiment sizeFactors counts logcounts counts<- logcounts<-
+#' @importFrom SummarizedExperiment assays<- assays
+#' @importFrom DelayedArray DelayedArray
 #'
 #' @return A SingleCellAlleleExperiment object.
-SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose=FALSE){
+SingleCellAlleleExperiment <- function(..., lookup, metadata=NULL, threshold=0,
+                                       exp_type="ENS", log=FALSE,
+                                       gene_symbols=FALSE, verbose=FALSE){
   sce <- SingleCellExperiment(...)
 
-  rt_scae_lookup_start <- Sys.time()
-  sce_add_look <- ext_rd(sce, exp_type, verbose = verbose)
+  sce_add_look <- ext_rd(sce, exp_type, gene_symbols, verbose=verbose)
 
   if (verbose){
-    rt_scae_lookup_end <- Sys.time()
-    diff_rt_scae_lookup <- round(rt_scae_lookup_end - rt_scae_lookup_start, digits=2)
-    message("     Generating SCAE (1/5) extending rowData: ", diff_rt_scae_lookup, " seconds")
+    message("    Generating SingleCellAlleleExperiment object:
+                 Extending rowData with new classifiers")
   }
 
+  sce_filtered <- sce_add_look[, colSums(counts(sce_add_look)) > threshold]
 
-  rt_scae_filt_norm_start <- Sys.time()
-  sce_filter_norm <- filter_norm(sce_add_look, threshold)
   if (verbose){
-    rt_scae_filt_norm_end <- Sys.time()
-    diff_rt_scae_filt_norm <- round(rt_scae_filt_norm_end - rt_scae_filt_norm_start, digits=2)
-    message("     Generating SCAE (2/5) filtering and normalization: ", diff_rt_scae_filt_norm, " seconds")
+    message("    Generating SingleCellAlleleExperiment object:
+                 Filtering at ", threshold, " UMI counts.")
   }
 
+  if(log){
+    sce_filtered <- scuttle::computeLibraryFactors(sce_filtered)
+    if (verbose){
+      message("    Generating SingleCellAlleleExperiment object:
+                   Compute Library Factors before adding new layers")
+    }
+  }
 
-  rt_scae_a2g_start <- Sys.time()
-  scae <- alleles2genes(sce_filter_norm, lookup, exp_type)
+  scae <- alleles2genes(sce_filtered, lookup, exp_type, gene_symbols)
+
   if (verbose){
-    rt_scae_a2g_end <- Sys.time()
-    diff_rt_scae_a2g <- round(rt_scae_a2g_end - rt_scae_a2g_start, digits=2)
-    message("     Generating SCAE (3/5) alleles2genes: ", diff_rt_scae_a2g, " seconds")
+    message("    Generating SingleCellAlleleExperiment object:
+                 Aggregating alleles corresponding to the same gene")
   }
 
+  scae <- genes2functional(scae, lookup, exp_type, gene_symbols)
 
-  rt_scae_g2f_start <- Sys.time()
-  scae <- genes2functional(scae, lookup, exp_type)
   if (verbose){
-    rt_scae_g2f_end <- Sys.time()
-    diff_rt_scae_g2f <- round(rt_scae_g2f_end - rt_scae_g2f_start, digits = 2)
-    message("     Generating SCAE (4/5) genes2functional: ", diff_rt_scae_g2f, " seconds")
+    message("    Generating SingleCellAlleleExperiment object:
+                 Aggregating genes corresponding to the same functional groups")
   }
 
-
-  rt_scae_log_start <- Sys.time()
-  scae <- log_transform(scae)
-  if (verbose){
-    rt_scae_log_end <- Sys.time()
-    diff_rt_scae_log <- round(rt_scae_log_end - rt_scae_log_start, digits = 2)
-    message("     Generating SCAE (5/5) log_transform: ", diff_rt_scae_log, " seconds")
+  if(log){
+    normed_counts <- scuttle::normalizeCounts(scae, size_factors=sizeFactors(scae), transform="log")
+    assays(scae)$logcounts  <- normed_counts
+    logcounts(scae) <- DelayedArray::DelayedArray(logcounts(scae))
+    if (verbose){
+      message("    Generating SingleCellAlleleExperiment object:
+                   Generate logcounts assay using Library Factors")
+    }
   }
 
+  counts(scae) <- DelayedArray::DelayedArray(counts(scae))
+  scae$metadata$knee_info <- metadata
   .scae(scae)
 }
 
@@ -98,6 +108,7 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object. Object is initially constructed in the `SingleCellAlleleExperiment` constructor.
 #' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
+#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
 #' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
 #'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
@@ -105,31 +116,29 @@ SingleCellAlleleExperiment <- function(..., threshold, exp_type, lookup, verbose
 #' @importFrom SingleCellExperiment rowData
 #'
 #' @return A SingleCellExperiment object.
-ext_rd <- function(sce, exp_type, verbose=FALSE){
-  if (exp_type == "ENS"){
-    if (verbose){
-      message("Using org.Hs to retrieve NCBI gene identifiers.")
-    }
-    gene_symbols <- get_ncbi_org(sce)
-    rowData(sce)$Symbol <- gene_symbols
-  }
+ext_rd <- function(sce, exp_type, gene_symbols, verbose=FALSE){
 
   allele_names_all <- find_allele_ids(sce)
 
   # Group of genes for which extended informaton is stored
   rowData(sce[allele_names_all,])$NI_I <- "I"
-
   # Allele level
   rowData(sce[allele_names_all,])$Quant_type <- "A"
-
   # Group of genes for which classical (gene level) informaton is stored
-  rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$NI_I <- "NI"
-
+  rn_in_alleles <- rownames(sce) %in% allele_names_all
+  rowData(sce)[!(rn_in_alleles), ]$NI_I <- "NI"
   # Gene level
-  rowData(sce)[!(rownames(sce) %in% allele_names_all), ]$Quant_type <- "G"
+  rowData(sce)[!(rn_in_alleles), ]$Quant_type <- "G"
 
-  rowData(sce)[rownames(rowData(scae_subset_alleles(sce))),]$Symbol <- rownames(rowData(scae_subset_alleles(sce)))
-
+  if (exp_type == "ENS" && gene_symbols){
+    if (verbose){
+      message("Using org.Hs to retrieve NCBI gene identifiers.")
+    }
+    gene_symbols <- get_ncbi_org(sce)
+    rowData(sce)$Symbol <- gene_symbols
+    rn_sce <- rownames(rowData(scae_subset_alleles(sce)))
+    rowData(sce)[rn_sce,]$Symbol <- rn_sce
+  }
   sce
 }
 
@@ -142,8 +151,6 @@ ext_rd <- function(sce, exp_type, verbose=FALSE){
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #'
-#' @importFrom org.Hs.eg.db org.Hs.egSYMBOL org.Hs.egENSEMBL
-#' @importFrom AnnotationDbi mappedkeys
 #' @importFrom methods as
 #' @importFrom SingleCellExperiment rowData
 #'
@@ -168,30 +175,6 @@ get_ncbi_org <- function(sce){
 }
 
 
-#-2------------------barcode filtering and normalization-----------------------#
-
-#' Preprocessing
-#'
-#' @description
-#' Internal function used in `SingleCellAlleleExperiment()` constructor as a preprocessing step for
-#' filtering the barcodes and normalizing the count values.
-#'
-#' @param sce A \code{\link{SingleCellExperiment}} object.
-#' @param threshold An integer value used as a threshold for filtering low-quality barcodes/cells.
-#'
-#' @importFrom Matrix colSums
-#' @importFrom SingleCellExperiment counts
-#' @importFrom scuttle computeLibraryFactors
-#'
-#' @return A SingleCellExperiment object.
-filter_norm <- function(sce, threshold=0){
-
-  filtered  <- sce[, colSums(counts(sce)) > threshold]
-  df_scales <- computeLibraryFactors(filtered)
-  df_scales
-}
-
-
 #-3-----------------------------allele2genes-----------------------------------#
 
 #' Identify rows containing allele information for WTA
@@ -201,13 +184,15 @@ filter_norm <- function(sce, threshold=0){
 #' return the rows specifying allele-quantification information.
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
+#'
 #' @importFrom SingleCellExperiment counts
 #'
 #' @return A SingleCellExperiment object.
 find_allele_ids <- function(sce){
-  a <- grepl("*", rownames(counts(sce)), fixed=TRUE)
+  rn_counts_sce <- rownames(counts(sce))
+  a <- grepl("*", rn_counts_sce, fixed=TRUE)
   if (sum(a) == 0){
-    a <- grepl("HLA-", rownames(counts(sce)), fixed=TRUE)
+    a <- grepl("HLA-", rn_counts_sce, fixed=TRUE)
   }
 
   allele_names_all <- rownames(counts(sce)[a,])
@@ -256,14 +241,15 @@ get_allelecounts <- function(sce, lookup){
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
 #' @param exp_type A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
+#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
 #'
-#' @importFrom Matrix colSums
-#' @importFrom SummarizedExperiment rowData<- colData<-
 #' @importFrom SingleCellExperiment rowData colData SingleCellExperiment
+#' @importFrom SummarizedExperiment rowData<- colData<-
+#' @importFrom Matrix colSums
 #' @importFrom BiocGenerics rbind
 #'
 #' @return A SingleCellExperiment object.
-alleles2genes <- function(sce, lookup, exp_type){
+alleles2genes <- function(sce, lookup, exp_type, gene_symbols){
 
   v_acounts <- get_allelecounts(sce, lookup)
 
@@ -274,25 +260,27 @@ alleles2genes <- function(sce, lookup, exp_type){
   rownames(al_gene) <- uniqs
 
   for (i in seq_along(uniqs)){
-    uniq_sum <- colSums(alleletogene_counts[rownames(alleletogene_counts) %in% uniqs[i], , drop=FALSE])
+    rn_a2g <- rownames(alleletogene_counts)
+    uniq_sum <- colSums(alleletogene_counts[rn_a2g %in% uniqs[i], , drop=FALSE])
     al_gene[i,] <- uniq_sum
   }
 
   al_sce <- SingleCellExperiment(assays=list(counts=al_gene),
                                  colData=colData(sce))
-  rowData(al_sce)$Symbol <- rownames(al_gene)
-
 
   if (exp_type == "ENS"){
     rowData(al_sce)$Ensembl_ID <- rownames(al_gene)
   }
+  if (gene_symbols){
+    rowData(al_sce)$Symbol <- rownames(al_gene)
+  }
 
   new_sce <- BiocGenerics::rbind(sce, al_sce)
 
-  rowData(new_sce[rownames(new_sce) %in% uniqs])$NI_I <- "I"
-  rowData(new_sce[rownames(new_sce) %in% uniqs])$Quant_type <- "G"
-
-  new_sce
+  uniq_genes_sce <- rownames(new_sce) %in% uniqs
+  rowData(new_sce[uniq_genes_sce])$NI_I <- "I"
+  rowData(new_sce[uniq_genes_sce])$Quant_type <- "G"
+  return(new_sce)
 }
 
 
@@ -309,6 +297,7 @@ alleles2genes <- function(sce, lookup, exp_type){
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
 #' @param exp_type A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
+#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
 #'
 #' @importFrom SingleCellExperiment colData counts SingleCellExperiment
 #' @importFrom SummarizedExperiment colData<- rowData<-
@@ -316,72 +305,46 @@ alleles2genes <- function(sce, lookup, exp_type){
 #' @importFrom BiocGenerics rbind
 #'
 #' @return A SingleCellExperiment object.
-genes2functional <- function(sce, lookup, exp_type){
+genes2functional <- function(sce, lookup, exp_type, gene_symbols){
 
   #find functional classes for each gene
   gene_names <- rownames(get_agenes(sce))
+
   list_func  <- list()
   for (i in seq_along(gene_names)){
     func_classes <- lookup$Function[lookup$Gene %in% gene_names[i]][1]
     list_func[[length(list_func) + 1]] <- func_classes
   }
+
   gene_func_names <- unlist(list_func)
+  gene2func_counts <- counts(get_agenes(sce))
 
-  genetofunc_counts <- counts(get_agenes(sce))
-  rownames(genetofunc_counts) <- gene_func_names
-
-  uniqs     <- unique(rownames(genetofunc_counts))
+  rn_g2f <- rownames(gene2func_counts)
+  rn_g2f <- gene_func_names
+  uniqs <- unique(rn_g2f )
   gene_func <- matrix(0, nrow=length(uniqs), ncol=ncol(sce[1,]))
   rownames(gene_func) <- uniqs
 
   for (i in seq_along(uniqs)){
-    gene_colsums  <- colSums(genetofunc_counts[rownames(genetofunc_counts) %in% uniqs[i], , drop=FALSE])
+    gene_colsums <- colSums(gene2func_counts[rn_g2f %in% uniqs[i], , drop=FALSE])
     gene_func[i,] <- gene_colsums
   }
 
   func_sce <- SingleCellExperiment(assays=list(counts=gene_func),
                                    colData=colData(sce))
-  rowData(func_sce)$Symbol <- rownames(func_sce)
-
   if (exp_type == "ENS"){
     rowData(func_sce)$Ensembl_ID <- rownames(func_sce)
   }
+  if (gene_symbols){
+    rowData(func_sce)$Symbol <- rownames(func_sce)
+  }
 
   final_scae <- BiocGenerics::rbind(sce, func_sce)
+  uniq_func_sce <- rownames(final_scae) %in% uniqs
 
   # Genes with extended quantification
-  rowData(final_scae[rownames(final_scae) %in% uniqs])$NI_I <- "I"
+  rowData(final_scae[uniq_func_sce])$NI_I <- "I"
   # Functional level
-  rowData(final_scae[rownames(final_scae) %in% uniqs])$Quant_type <- "F"
-
+  rowData(final_scae[uniq_func_sce])$Quant_type <- "F"
   final_scae
-}
-
-
-#-5-------------------------log transform counts-------------------------------#
-
-#' Log-transform normalized counts
-#'
-#' @description
-#' Internal function used in the `SingleCellAlleleExperiment()` constructor to log-normalize the raw counts and add them to the \code{\link{logcounts}} assay.
-#'
-#' @param sce A \code{\link{SingleCellExperiment}} object.
-#'
-#' @importFrom scuttle normalizeCounts
-#' @importFrom SingleCellExperiment sizeFactors counts logcounts counts<- logcounts<-
-#' @importFrom SummarizedExperiment assays<- assays
-#' @importFrom DelayedArray DelayedArray
-#'
-#' @return A SingleCellExperiment object.
-log_transform <- function(sce){
-
-  normed_counts <- normalizeCounts(sce,
-                                   size_factors=sizeFactors(sce),
-                                   transform="log")
-
-  assays(sce)$logcounts  <- normed_counts
-  counts(sce) <- DelayedArray(counts(sce))
-  logcounts(sce) <- DelayedArray(logcounts(sce))
-
-  sce
 }

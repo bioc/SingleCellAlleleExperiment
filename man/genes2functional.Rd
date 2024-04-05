@@ -4,7 +4,7 @@
 \alias{genes2functional}
 \title{Building second new subassay for the SingleCellAlleleExperiment object}
 \usage{
-genes2functional(sce, lookup, exp_type)
+genes2functional(sce, lookup, exp_type, gene_symbols)
 }
 \arguments{
 \item{sce}{A \code{\link{SingleCellExperiment}} object.}
@@ -12,6 +12,8 @@ genes2functional(sce, lookup, exp_type)
 \item{lookup}{A data.frame object containing the lookup table.}
 
 \item{exp_type}{A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.}
+
+\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.}
 }
 \value{
 A SingleCellExperiment object.
