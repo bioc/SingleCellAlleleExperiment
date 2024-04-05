@@ -88,6 +88,8 @@ scae_subset_functional <- function(scae) {
 #' @param scae SCAE object
 #' @param subset character string specifying a data layer
 #'
+#' @importFrom methods validObject
+#'
 #' @return SCAE object
 #'
 #' @examples
@@ -129,6 +131,22 @@ scae_subset <- function(scae, subset=c("nonimmune", "alleles", "immune_genes", "
                     "immune_genes"=get_agenes(scae),
                     "functional_groups"=scae_subset_functional(scae),
                     message("Invalid layer specified, Choose from `nonimmune`, `alleles`, `immune_genes`, `functional_groups`"))
+  methods::validObject(scae_sub)
   return(scae_sub)
 }
 
+
+#-------------------------------setters----------------------------------------#
+
+#' rowData setter
+#' @param x A SingleCellAlleleExperiment object
+#' @param ... additional paramaters passed to rowData<-
+#' @param value arbitrary value (can be integer, character,..)
+#'
+#' @importFrom SummarizedExperiment "rowData<-"
+#' @importFrom methods validObject
+#' @export
+setReplaceMethod("rowData", "SingleCellAlleleExperiment", function(x, ..., value) {
+  scae <- callNextMethod()
+  methods::validObject(scae)
+})
