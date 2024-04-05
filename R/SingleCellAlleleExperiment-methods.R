@@ -17,6 +17,7 @@ NULL
 
 #' @importFrom S4Vectors coolcat
 #' @importFrom methods callNextMethod
+#' @importMethodsFrom SingleCellExperiment show
 .scae_show <- function(object) {
   n_tot_feats <- nrow(object)
   n_a_feats <- nrow(get_agenes(object))
