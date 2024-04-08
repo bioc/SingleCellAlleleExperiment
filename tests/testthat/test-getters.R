@@ -9,53 +9,51 @@ lookup <- utils::read.csv(system.file("extdata",
 
 scae <- read_allele_counts(example_data_5k$dir,
                            sample_names="example_data_wta",
-                           filter_mode="custom",
+                           filter_mode="yes",
                            lookup_file=lookup,
                            barcode_file=example_data_5k$barcodes,
                            gene_file=example_data_5k$features,
                            matrix_file=example_data_5k$matrix,
-                           filter_threshold=0,
                            verbose=TRUE)
+
+rn_c_scae <- rownames(counts(scae))
+
+scae_ni_genes <- get_nigenes(scae)
+scae_alleles <- scae_subset_alleles(scae)
+scae_a_genes <- get_agenes(scae)
+scae_functional <- scae_subset_functional(scae)
 
 # non_immune genes layer
 test_that("non-immune genes getter", {
-  rn_counts_sce <- rownames(counts(scae))
-  expect_equal(get_nigenes(scae),
-               scae[grepl("ENSG", rn_counts_sce, fixed=TRUE),])
+  expect_equal(scae_ni_genes, scae[grepl("ENSG", rn_c_scae, fixed=TRUE),])
 })
 
 # alleles layer
 test_that("alleles getter", {
-  rn_counts_sce <- rownames(counts(scae))
-  expect_equal(scae_subset_alleles(scae),
-               scae[grepl("*", rn_counts_sce, fixed=TRUE),])
+  expect_equal(scae_alleles, scae[grepl("*", rn_c_scae, fixed=TRUE),])
 })
 
 # immune gene layer
 test_that("immune genes getter", {
-  rn_counts_sce <- rownames(counts(scae))
-  expect_equal(get_agenes(scae),
-               scae[grepl("HLA-", rn_counts_sce, fixed=TRUE),])
+  expect_equal(scae_a_genes, scae[grepl("HLA-", rn_c_scae, fixed=TRUE),])
 })
 
 # functional class layer
 test_that("functional class getter", {
-  rn_counts_sce <- rownames(counts(scae))
-  expect_equal(scae_subset_functional(scae),
-               scae[grepl("class", rn_counts_sce, fixed=TRUE),])
+  expect_equal(scae_functional, scae[grepl("class", rn_c_scae, fixed=TRUE),])
 })
 
 test_that("test wrapper getter", {
   #nonimmune
-  expect_equal(scae_subset(scae, "nonimmune"), get_nigenes(scae))
+  expect_equal(scae_subset(scae, "nonimmune"), scae_ni_genes)
   #allele
-  expect_equal(scae_subset(scae, "alleles"), scae_subset_alleles(scae))
+  expect_equal(scae_subset(scae, "alleles"), scae_alleles)
   #immune
-  expect_equal(scae_subset(scae, "immune_genes"), get_agenes(scae))
+  expect_equal(scae_subset(scae, "immune_genes"), scae_a_genes)
   #functional
-  expect_equal(scae_subset(scae, "functional_groups"), scae_subset_functional(scae))
+  expect_equal(scae_subset(scae, "functional_groups"), scae_functional)
 
-  expect_message(scae_subset(scae, "wrong_layer"),
-                 regexp="Invalid layer specified, Choose from `nonimmune`, `alleles`, `immune_genes`, `functional_groups`")
+  msg <- "Invalid layer specified, Choose from `nonimmune`, `alleles`, `immune_genes`, `functional_groups`"
+  expect_message(scae_subset(scae, "wrong_layer"), regexp=msg)
 
 })

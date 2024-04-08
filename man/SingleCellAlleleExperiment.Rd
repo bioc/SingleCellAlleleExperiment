@@ -3,6 +3,7 @@
 \docType{class}
 \name{SingleCellAlleleExperiment-class}
 \alias{SingleCellAlleleExperiment-class}
+\alias{.scae}
 \alias{SingleCellAlleleExperiment}
 \title{Constructor SingleCellAlleleExperiment class}
 \usage{
@@ -44,4 +45,62 @@ Constructor is used in the read in function \code{read_allele_counts()}. Perform
 a \code{SingleCellExperiment} object into the extended \code{SingleCellAlleleExperiment} object. SCAE objects
 contain allele, gene and functional level quantification results. The additional layers are stored as additional
 rows in the count assays as well as in extended rowData.
+}
+\examples{
+##-If you want to use the Constructor on its own, some preprocessing is
+##-necessary to bring the data in proper format
+##-Here, we use an example dataset found in in the `scaeData` package.
+
+##-Find an alternative and recommended read in below as a second example
+
+example_data_5k <- scaeData::scaeDataGet(dataset="pbmc_5k")
+lookup_name <- "pbmc_5k_lookup_table.csv"
+lookup <- read.csv(system.file("extdata", lookup_name, package="scaeData"))
+
+barcode_loc <- file.path(example_data_5k$dir, example_data_5k$barcodes)
+feature_loc <- file.path(example_data_5k$dir, example_data_5k$features)
+matrix_loc  <- file.path(example_data_5k$dir, example_data_5k$matrix)
+
+feature_info <- utils::read.delim(feature_loc, header=FALSE)
+cell_names   <- utils::read.csv(barcode_loc, sep="", header=FALSE)
+mat <- t(Matrix::readMM(matrix_loc))
+
+##-Prepare input data
+colnames(feature_info) <- "Ensembl_ID"
+sample_names <- "pbmc_5k"
+sparse_mat <- as(mat, "CsparseMatrix")
+
+##--colData
+cell_info_list <- S4Vectors::DataFrame(Sample=rep(sample_names,
+                                                 length(cell_names)),
+                                      Barcode=cell_names$V1,
+                                      row.names=NULL)
+##--rowData and count matrix
+rownames(feature_info) <- feature_info[,1]
+cnames <- cell_info_list$Barcode
+colnames(sparse_mat) <- cnames
+
+scae <- SingleCellAlleleExperiment(assays=list(counts=sparse_mat),
+                                   rowData=feature_info,
+                                   colData=cell_info_list,
+                                   lookup=lookup,
+                                   verbose=TRUE)
+
+scae
+
+
+##-OR, use the read in function `read_allele_counts()` !![RECOMMENDED]!!
+##-Find more examples in its documentation using `?read_allele_counts`
+
+scae_2 <- read_allele_counts(example_data_5k$dir,
+                             sample_names="example_data",
+                             filter_mode="no",
+                             lookup_file=lookup,
+                             barcode_file=example_data_5k$barcodes,
+                             gene_file=example_data_5k$features,
+                             matrix_file=example_data_5k$matrix,
+                             verbose=TRUE)
+
+scae_2
+
 }

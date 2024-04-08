@@ -26,7 +26,65 @@
 #' @importFrom DelayedArray DelayedArray
 #' @importFrom methods new
 #'
+#' @examples
+#' ##-If you want to use the Constructor on its own, some preprocessing is
+#' ##-necessary to bring the data in proper format
+#' ##-Here, we use an example dataset found in in the `scaeData` package.
+#'
+#' ##-Find an alternative and recommended read in below as a second example
+#'
+#' example_data_5k <- scaeData::scaeDataGet(dataset="pbmc_5k")
+#' lookup_name <- "pbmc_5k_lookup_table.csv"
+#' lookup <- read.csv(system.file("extdata", lookup_name, package="scaeData"))
+#'
+#' barcode_loc <- file.path(example_data_5k$dir, example_data_5k$barcodes)
+#' feature_loc <- file.path(example_data_5k$dir, example_data_5k$features)
+#' matrix_loc  <- file.path(example_data_5k$dir, example_data_5k$matrix)
+#'
+#' feature_info <- utils::read.delim(feature_loc, header=FALSE)
+#' cell_names   <- utils::read.csv(barcode_loc, sep="", header=FALSE)
+#' mat <- t(Matrix::readMM(matrix_loc))
+#'
+#' ##-Prepare input data
+#' colnames(feature_info) <- "Ensembl_ID"
+#' sample_names <- "pbmc_5k"
+#' sparse_mat <- as(mat, "CsparseMatrix")
+#'
+#' ##--colData
+#' cell_info_list <- S4Vectors::DataFrame(Sample=rep(sample_names,
+#'                                                  length(cell_names)),
+#'                                       Barcode=cell_names$V1,
+#'                                       row.names=NULL)
+#' ##--rowData and count matrix
+#' rownames(feature_info) <- feature_info[,1]
+#' cnames <- cell_info_list$Barcode
+#' colnames(sparse_mat) <- cnames
+#'
+#' scae <- SingleCellAlleleExperiment(assays=list(counts=sparse_mat),
+#'                                    rowData=feature_info,
+#'                                    colData=cell_info_list,
+#'                                    lookup=lookup,
+#'                                    verbose=TRUE)
+#'
+#' scae
+#'
+#'
+#' ##-OR, use the read in function `read_allele_counts()` !![RECOMMENDED]!!
+#' ##-Find more examples in its documentation using `?read_allele_counts`
+#'
+#' scae_2 <- read_allele_counts(example_data_5k$dir,
+#'                              sample_names="example_data",
+#'                              filter_mode="no",
+#'                              lookup_file=lookup,
+#'                              barcode_file=example_data_5k$barcodes,
+#'                              gene_file=example_data_5k$features,
+#'                              matrix_file=example_data_5k$matrix,
+#'                              verbose=TRUE)
+#'
+#' scae_2
+#'
 #' @return A SingleCellAlleleExperiment object.
+#' @export
 SingleCellAlleleExperiment <- function(...,
                                        lookup,
                                        metadata=NULL,
@@ -242,10 +300,10 @@ get_allelecounts <- function(sce, lookup){
 #' @param exp_type A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
 #' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
 #'
-#' @importFrom SingleCellExperiment rowData colData SingleCellExperiment
+#' @importFrom SingleCellExperiment rowData colData SingleCellExperiment rbind
 #' @importFrom SummarizedExperiment rowData<- colData<-
 #' @importFrom Matrix colSums
-#' @importFrom BiocGenerics rbind
+#'
 #'
 #' @return A SingleCellExperiment object.
 alleles2genes <- function(sce, lookup, exp_type, gene_symbols){
@@ -274,14 +332,13 @@ alleles2genes <- function(sce, lookup, exp_type, gene_symbols){
     rowData(al_sce)$Symbol <- rownames(al_gene)
   }
 
-  new_sce <- BiocGenerics::rbind(sce, al_sce)
+  new_sce <- SingleCellExperiment::rbind(sce, al_sce)
 
   uniq_genes_sce <- rownames(new_sce) %in% uniqs
   rowData(new_sce[uniq_genes_sce])$NI_I <- "I"
   rowData(new_sce[uniq_genes_sce])$Quant_type <- "G"
   return(new_sce)
 }
-
 
 #-4------------------------------genes2func------------------------------------#
 
@@ -298,10 +355,9 @@ alleles2genes <- function(sce, lookup, exp_type, gene_symbols){
 #' @param exp_type A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
 #' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
 #'
-#' @importFrom SingleCellExperiment colData counts SingleCellExperiment
+#' @importFrom SingleCellExperiment colData counts SingleCellExperiment rbind
 #' @importFrom SummarizedExperiment colData<- rowData<-
 #' @importFrom Matrix colSums
-#' @importFrom BiocGenerics rbind
 #'
 #' @return A SingleCellExperiment object.
 genes2functional <- function(sce, lookup, exp_type, gene_symbols){
@@ -338,7 +394,7 @@ genes2functional <- function(sce, lookup, exp_type, gene_symbols){
     rowData(func_sce)$Symbol <- rownames(func_sce)
   }
 
-  final_scae <- BiocGenerics::rbind(sce, func_sce)
+  final_scae <- SingleCellExperiment::rbind(sce, func_sce)
   uniq_func_sce <- rownames(final_scae) %in% uniqs
 
   # Genes with extended quantification

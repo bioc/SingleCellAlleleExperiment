@@ -36,8 +36,24 @@ scae <- read_allele_counts(example_data_5k$dir,
                            gene_file=example_data_5k$features,
                            matrix_file=example_data_5k$matrix,
                            filter_threshold=0,
+                           log=FALSE,
                            gene_symbols=TRUE,
                            verbose=TRUE)
+show(scae)
+
+test_that("validty test", {
+
+  expect_true(validObject(scae))
+
+  expect_error(rowData(scae)$NI_I <- "random_value", regexp="")
+  expect_error(rowData(scae)$NI_I <- NULL, regexp="")
+  expect_error(rowData(scae)$Quant_type <- "random_value", regexp="")
+
+  # change 'NI_I' column
+  expect_error(colnames(rowData(scae))[2] <- "arbitrary_name")
+  # change 'Quant_type' column
+  expect_error(colnames(rowData(scae))[3] <- "arbitrary_name")
+})
 
 
 test_that("rownames and rowData check", {
@@ -74,6 +90,7 @@ test_that("colnames and colData check", {
                length(cell_names$V1))
 })
 
+#TODO check for logcounts too
 test_that("assay check", {
   #dim-check
   expect_equal(dim(counts(scae)[1:dim(mat_filtered_zero)[1],]),
@@ -84,13 +101,12 @@ test_that("assay check", {
   random_num1 <- sample(1:dim(mat_filtered_zero)[1], 1)
   random_num2 <- sample(1:dim(mat_filtered_zero)[2], 1)
 
-  #check random if random entry is equal
+  #check if random entry is equal
   expect_equal(counts(scae_no_immune_layers)[random_num1, random_num2],
                mat_filtered_zero[random_num1, random_num2])
 
-  expect_type(scae[random_num1, random_num2], "S4")
+  expect_type(scae, "S4")
 })
-
 
 #test different filter/no-filter modes
 test_that("check input-parameter errors", {
@@ -119,7 +135,7 @@ test_that("check input-parameter errors", {
                                       matrix_file=example_data_5k$matrix,
                                       filter_threshold=NULL,
                                       verbose=FALSE),
-    regexp = "")
+                 regexp = "")
   }else {
     expect_message(read_allele_counts(example_data_5k$dir,
                                       sample_names="example_data_wta",
@@ -135,7 +151,66 @@ test_that("check input-parameter errors", {
 
 
 
+  #Testing for the correct output message of the filter_mode="yes" mode
 
+  if (!requireNamespace("scuttle", quietly=TRUE)) {
+    expect_error(read_allele_counts(example_data_5k$dir,
+                                    sample_names="example_data_wta",
+                                    filter_mode="no",
+                                    lookup_file=lookup,
+                                    barcode_file=example_data_5k$barcodes,
+                                    gene_file=example_data_5k$features,
+                                    matrix_file=example_data_5k$matrix,
+                                    filter_threshold=NULL,
+                                    log=TRUE,
+                                    verbose=TRUE),
+                 regexp = "")
+  }else {
+    expect_message(read_allele_counts(example_data_5k$dir,
+                                      sample_names="example_data_wta",
+                                      filter_mode="no",
+                                      lookup_file=lookup,
+                                      barcode_file=example_data_5k$barcodes,
+                                      gene_file=example_data_5k$features,
+                                      matrix_file=example_data_5k$matrix,
+                                      filter_threshold=NULL,
+                                      log=TRUE,
+                                      verbose=TRUE),
+                   regexp = "    Generating SingleCellAlleleExperiment object:
+                   Generate logcounts assay using Library Factors")
+  }
+
+
+
+  if (!requireNamespace("scuttle", quietly=TRUE)) {
+    expect_error(read_allele_counts(example_data_5k$dir,
+                                    sample_names="example_data_wta",
+                                    filter_mode="no",
+                                    lookup_file=lookup,
+                                    barcode_file=example_data_5k$barcodes,
+                                    gene_file=example_data_5k$features,
+                                    matrix_file=example_data_5k$matrix,
+                                    filter_threshold=NULL,
+                                    log=TRUE,
+                                    verbose=TRUE),
+                 regexp = "")
+  }else {
+    expect_message(read_allele_counts(example_data_5k$dir,
+                                      sample_names="example_data_wta",
+                                      filter_mode="no",
+                                      lookup_file=lookup,
+                                      barcode_file=example_data_5k$barcodes,
+                                      gene_file=example_data_5k$features,
+                                      matrix_file=example_data_5k$matrix,
+                                      filter_threshold=NULL,
+                                      log=TRUE,
+                                      verbose=TRUE),
+                   regexp = "    Generating SingleCellAlleleExperiment object:
+                   Generate logcounts assay using Library Factors")
+  }
+
+
+  #leave this out
   #Testing for the correct output message of the filter_mode="no" mode
   expect_message(read_allele_counts(example_data_5k$dir,
                                     sample_names="example_data_wta",

@@ -31,8 +31,7 @@ Imports:
   utils,
   Matrix,
   S4Vectors,
-  stats,
-  BiocGenerics,
+  stats
 Suggests:
   scaeData,
   knitr,

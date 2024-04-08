@@ -40,8 +40,7 @@
 #' lookup <- read.csv(system.file("extdata", "pbmc_5k_lookup_table.csv", package="scaeData"))
 #'
 #'
-#' # preflight mode, not generating an SCAE object
-#' # used for quality-assessment by plotting the knee plot
+#' # preflight mode, default filtering with a threshold of 0 UMI counts
 #' scae_preflight <- read_allele_counts(example_data_5k$dir,
 #'                           sample_names="example_data",
 #'                           filter_mode="no",
@@ -51,8 +50,10 @@
 #'                           matrix_file=example_data_5k$matrix,
 #'                           filter_threshold=NULL)
 #'
+#' scae_preflight
 #'
-#' # automatic filtering mode, filtering out low-quality cells on the inflection point of the knee plot
+#' # automatic filtering mode, filtering out low-quality cells
+#' # on the inflection point of the knee plot
 #' #scae_filtered <- read_allele_counts(example_data_5k$dir,
 #' #                         sample_names="example_data",
 #' #                         filter_mode="yes",
@@ -64,7 +65,6 @@
 #' #                         verbose=TRUE)
 #'
 #' # scae_filtered
-#'
 #'
 #' # custom filtering mode, setting up a custom filter threshold for filtering out
 #' # low-quality cells (e.g. after using the preflight mode and assessing the knee plot)
@@ -166,22 +166,22 @@ read_allele_counts <- function(samples_dir,
     message("Data Read_in completed")
   }
 
-  sce <- SingleCellAlleleExperiment(assays=list(counts=full_data),
-                                    rowData=feature_info,
-                                    colData=cell_info_list,
-                                    metadata=knee_list,
-                                    threshold=inflection_threshold,
-                                    exp_type=exp_type,
-                                    lookup=lookup,
-                                    log=log,
-                                    gene_symbols=gene_symbols,
-                                    verbose=verbose)
+  scae <- SingleCellAlleleExperiment(assays=list(counts=full_data),
+                                     rowData=feature_info,
+                                     colData=cell_info_list,
+                                     metadata=knee_list,
+                                     threshold=inflection_threshold,
+                                     exp_type=exp_type,
+                                     lookup=lookup,
+                                     log=log,
+                                     gene_symbols=gene_symbols,
+                                     verbose=verbose)
 
   if (verbose){
     message("SingleCellAlleleExperiment object completed")
   }
 
-  return(sce)
+  return(scae)
 }
 
 
@@ -224,7 +224,7 @@ read_from_sparse_allele <- function(path,
   }
 
   list(mat=Matrix::t(mat),
-       cell_names= cell_names,
+       cell_names=cell_names,
        feature_info=feature_info,
        exp_type=exp_type)
 }
