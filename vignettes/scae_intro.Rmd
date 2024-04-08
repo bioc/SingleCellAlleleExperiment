@@ -132,6 +132,9 @@ library(scaeData)
 library(scater)
 library(scran)
 library(patchwork)
+library(DropletUtils)
+library(ggplot2)
+
 ```
 
 ## Reading in data and performing quality check
@@ -194,7 +197,7 @@ Additionally, the `verbose` parameter gives you an option to toggle runtime-info
 
 Only show the knee plot without generating a SCAE object. All function parameters are shown. Information messages (`verbose = FALSE`) are turned off.
 
-```{r warning=FALSE}
+```{r warning=FALSE, eval=FALSE}
 scae <- read_allele_counts(example_data_10k$dir,
                            sample_names="example_data",
                            filter_mode="no",
@@ -211,7 +214,7 @@ scae <- read_allele_counts(example_data_10k$dir,
 
 Automatic filtering mode and generation of a SCAE object. Filtering is performed on the computed inflection point of the knee plot.
 
-```{r warning=FALSE}
+```{r warning=FALSE, eval=FALSE}
 scae <- read_allele_counts(example_data_10k$dir,
                            sample_names="example_data",
                            filter_mode="yes",
@@ -237,7 +240,10 @@ scae <- read_allele_counts(example_data_10k$dir,
                            barcode_file=example_data_10k$barcodes,
                            gene_file=example_data_10k$features,
                            matrix_file=example_data_10k$matrix,
-                           filter_threshold=282)
+                           filter_threshold=282,
+                           log=TRUE,
+                           gene_symbols=TRUE,
+                           verbose=TRUE)
 scae
 ```
 
@@ -333,7 +339,10 @@ The non-imune genes are combined with each of the integrated immune gene allele-
 ### Non-immune genes + alleles
 
 ```{r}
-scae_nonimmune__allels_subset <- scae[c(rownames(scae_subset(scae, "nonimmune")), rownames(scae_subset(scae, "alleles"))), ]
+rn_scae_ni <- rownames(scae_subset(scae, "nonimmune"))
+rn_scae_alleles <- rownames(scae_subset(scae, "alleles"))
+
+scae_nonimmune__allels_subset <- scae[c(rn_scae_ni, rn_scae_alleles), ]
 
 scae_nonimmune__allels_subset
 ```
@@ -343,7 +352,9 @@ scae_nonimmune__allels_subset
 ### Non-immune genes + immune genes
 
 ```{r}
-scae_nonimmune__immune <- scae[c(rownames(scae_subset(scae, "nonimmune")), rownames(scae_subset(scae, "immune_genes"))), ]
+rn_scae_i <- rownames(scae_subset(scae, "immune_genes"))
+
+scae_nonimmune__immune <- scae[c(rn_scae_ni, rn_scae_i), ]
 
 scae_nonimmune__immune
 ```
@@ -353,7 +364,9 @@ scae_nonimmune__immune
 ### Non-immune genes + functional class
 
 ```{r}
-scae_nonimmune__functional <- scae[c(rownames(scae_subset(scae, "nonimmune")), rownames(scae_subset(scae, "functional_groups"))), ]
+rn_scae_functional <- rownames(scae_subset(scae, "functional_groups"))
+
+scae_nonimmune__functional <- scae[c(rn_scae_ni, rn_scae_functional), ]
 
 scae_nonimmune__functional
 ```
@@ -386,9 +399,16 @@ top_ni_f <- getTopHVGs(df_ni_f, prop=0.1)
 Compute PCA for each layer and store the results in the object. Its Important to make unique identifiers for each layer/run or the results will be overwritten and just saved as `PCA`. Here, the `runPCA` functions from the `r Biocpkg("scater")` package is used.
 
 ```{r}
-scae <- runPCA(scae, ncomponents=10, subset_row=top_ni_a, exprs_values="logcounts", name="PCA_a")
-scae <- runPCA(scae, ncomponents=10, subset_row=top_ni_g, exprs_values="logcounts", name="PCA_g")
-scae <- runPCA(scae, ncomponents=10, subset_row=top_ni_f, exprs_values="logcounts", name="PCA_f")
+assay <- "logcounts"
+
+scae <- runPCA(scae, ncomponents=10, subset_row=top_ni_a,
+               exprs_values=assay, name="PCA_a")
+
+scae <- runPCA(scae, ncomponents=10, subset_row=top_ni_g,
+               exprs_values=assay, name="PCA_g")
+
+scae <- runPCA(scae, ncomponents=10, subset_row=top_ni_f,
+               exprs_values=assay, name="PCA_f")
 ```
 
 ```{r}
@@ -433,11 +453,16 @@ Exemplary visualization for the t-SNE results on gene level for immune genes tha
 ### HLA-A immune gene and alleles
 
 ```{r fig3, fig.height = 4, fig.width = 12, fig.align = "center", warning = FALSE, message=FALSE}
-which_tsne <- "TSNE_g"
+tsne <- "TSNE_g"
 
-tsne_g_a  <- plotReducedDim(scae, dimred=which_tsne, colour_by="HLA-DRB1") + ggtitle("HLA-DRB1 gene")
-tsne_g_a1 <- plotReducedDim(scae, dimred=which_tsne, colour_by="DRB1*07:01:01:01") + ggtitle("Allele DRB1*07:01:01:01")
-tsne_g_a2 <- plotReducedDim(scae, dimred=which_tsne, colour_by="DRB1*13:01:01") + ggtitle("Allele DRB1*13:01:01")
+tsne_g_a  <- plotReducedDim(scae, dimred=tsne, colour_by="HLA-DRB1") +
+             ggtitle("HLA-DRB1 gene")
+
+tsne_g_a1 <- plotReducedDim(scae, dimred=tsne, colour_by="DRB1*07:01:01:01") + 
+             ggtitle("Allele DRB1*07:01:01:01")
+
+tsne_g_a2 <- plotReducedDim(scae, dimred=tsne, colour_by="DRB1*13:01:01") + 
+             ggtitle("Allele DRB1*13:01:01")
 
 p2 <- tsne_g_a + tsne_g_a1 + tsne_g_a2
 p2

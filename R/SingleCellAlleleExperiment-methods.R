@@ -26,7 +26,7 @@ NULL
 
   callNextMethod()
   cat(
-   "----------\n",
+   "---------------\n",
    "Including a total of ", n_tot_feats, " features:\n",
    sep = ""
   )

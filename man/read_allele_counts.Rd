@@ -67,8 +67,7 @@ example_data_5k <- scaeData::scaeDataGet(dataset="pbmc_5k")
 lookup <- read.csv(system.file("extdata", "pbmc_5k_lookup_table.csv", package="scaeData"))
 
 
-# preflight mode, not generating an SCAE object
-# used for quality-assessment by plotting the knee plot
+# preflight mode, default filtering with a threshold of 0 UMI counts
 scae_preflight <- read_allele_counts(example_data_5k$dir,
                           sample_names="example_data",
                           filter_mode="no",
@@ -78,8 +77,10 @@ scae_preflight <- read_allele_counts(example_data_5k$dir,
                           matrix_file=example_data_5k$matrix,
                           filter_threshold=NULL)
 
+scae_preflight
 
-# automatic filtering mode, filtering out low-quality cells on the inflection point of the knee plot
+# automatic filtering mode, filtering out low-quality cells
+# on the inflection point of the knee plot
 #scae_filtered <- read_allele_counts(example_data_5k$dir,
 #                         sample_names="example_data",
 #                         filter_mode="yes",
@@ -91,7 +92,6 @@ scae_preflight <- read_allele_counts(example_data_5k$dir,
 #                         verbose=TRUE)
 
 # scae_filtered
-
 
 # custom filtering mode, setting up a custom filter threshold for filtering out
 # low-quality cells (e.g. after using the preflight mode and assessing the knee plot)
