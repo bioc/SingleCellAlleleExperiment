@@ -144,7 +144,7 @@ scae_subset <- function(scae, subset=c("nonimmune", "alleles", "immune_genes", "
 #' @param value arbitrary value (can be integer, character,..)
 #'
 #' @importFrom SummarizedExperiment "rowData<-"
-#' @importFrom methods validObject
+#' @importFrom methods validObject callNextMethod
 #' @export
 setReplaceMethod("rowData", "SingleCellAlleleExperiment", function(x, ..., value) {
   scae <- callNextMethod()

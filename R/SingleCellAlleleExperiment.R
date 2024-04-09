@@ -72,16 +72,16 @@
 #' ##-OR, use the read in function `read_allele_counts()` !![RECOMMENDED]!!
 #' ##-Find more examples in its documentation using `?read_allele_counts`
 #'
-#' scae_2 <- read_allele_counts(example_data_5k$dir,
-#'                              sample_names="example_data",
-#'                              filter_mode="no",
-#'                              lookup_file=lookup,
-#'                              barcode_file=example_data_5k$barcodes,
-#'                              gene_file=example_data_5k$features,
-#'                              matrix_file=example_data_5k$matrix,
-#'                              verbose=TRUE)
+#' # scae_2 <- read_allele_counts(example_data_5k$dir,
+#' #                              sample_names="example_data",
+#' #                              filter_mode="no",
+#' #                              lookup_file=lookup,
+#' #                              barcode_file=example_data_5k$barcodes,
+#' #                              gene_file=example_data_5k$features,
+#' #                              matrix_file=example_data_5k$matrix,
+#' #                              verbose=TRUE)
 #'
-#' scae_2
+#' # scae_2
 #'
 #' @return A SingleCellAlleleExperiment object.
 #' @export
@@ -90,7 +90,7 @@ SingleCellAlleleExperiment <- function(...,
                                        metadata=NULL,
                                        threshold=0,
                                        exp_type="ENS",
-                                       log=FALSE,
+                                       log=TRUE,
                                        gene_symbols=FALSE,
                                        verbose=FALSE){
   sce <- SingleCellExperiment(...)
@@ -98,37 +98,32 @@ SingleCellAlleleExperiment <- function(...,
   sce_add_look <- ext_rd(sce, exp_type, gene_symbols, verbose=verbose)
 
   if (verbose){
-    message("    Generating SingleCellAlleleExperiment object:
-                 Extending rowData with new classifiers")
+    message("  Generating SCAE object: Extending rowData with new classifiers")
   }
 
   sce_filtered <- sce_add_look[, colSums(counts(sce_add_look)) > threshold]
 
   if (verbose){
-    message("    Generating SingleCellAlleleExperiment object:
-                 Filtering at ", threshold, " UMI counts.")
+    message("  Generating SCAE object: Filtering at ", threshold, " UMI counts.")
   }
 
   if(log){
     sce_filtered <- scuttle::computeLibraryFactors(sce_filtered)
     if (verbose){
-      message("    Generating SingleCellAlleleExperiment object:
-                   Compute Library Factors before adding new layers")
+      message("  Generating SCAE object: Compute Library Factors before adding new layers")
     }
   }
 
   scae <- alleles2genes(sce_filtered, lookup, exp_type, gene_symbols)
 
   if (verbose){
-    message("    Generating SingleCellAlleleExperiment object:
-                 Aggregating alleles corresponding to the same gene")
+    message("  Generating SCAE object: Aggregating alleles corresponding to the same gene")
   }
 
   scae <- genes2functional(scae, lookup, exp_type, gene_symbols)
 
   if (verbose){
-    message("    Generating SingleCellAlleleExperiment object:
-                 Aggregating genes corresponding to the same functional groups")
+    message("  Generating SCAE object: Aggregating genes corresponding to the same functional groups")
   }
 
   if(log){
@@ -136,8 +131,7 @@ SingleCellAlleleExperiment <- function(...,
     assays(scae)$logcounts  <- normed_counts
     logcounts(scae) <- DelayedArray::DelayedArray(logcounts(scae))
     if (verbose){
-      message("    Generating SingleCellAlleleExperiment object:
-                   Generate logcounts assay using Library Factors")
+      message("  Generating SCAE object: Generate logcounts assay using Library Factors")
     }
   }
 

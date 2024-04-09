@@ -13,7 +13,7 @@ SingleCellAlleleExperiment(
   metadata = NULL,
   threshold = 0,
   exp_type = "ENS",
-  log = FALSE,
+  log = TRUE,
   gene_symbols = FALSE,
   verbose = FALSE
 )

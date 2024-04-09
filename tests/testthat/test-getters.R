@@ -23,34 +23,34 @@ scae_alleles <- scae_subset_alleles(scae)
 scae_a_genes <- get_agenes(scae)
 scae_functional <- scae_subset_functional(scae)
 
-# non_immune genes layer
+## non_immune genes layer
 test_that("non-immune genes getter", {
   expect_equal(scae_ni_genes, scae[grepl("ENSG", rn_c_scae, fixed=TRUE),])
 })
 
-# alleles layer
+## allele layer
 test_that("alleles getter", {
   expect_equal(scae_alleles, scae[grepl("*", rn_c_scae, fixed=TRUE),])
 })
 
-# immune gene layer
+## immune gene layer
 test_that("immune genes getter", {
   expect_equal(scae_a_genes, scae[grepl("HLA-", rn_c_scae, fixed=TRUE),])
 })
 
-# functional class layer
+## functional class layer
 test_that("functional class getter", {
   expect_equal(scae_functional, scae[grepl("class", rn_c_scae, fixed=TRUE),])
 })
 
 test_that("test wrapper getter", {
-  #nonimmune
+  ## nonimmune
   expect_equal(scae_subset(scae, "nonimmune"), scae_ni_genes)
-  #allele
+  ## allele
   expect_equal(scae_subset(scae, "alleles"), scae_alleles)
-  #immune
+  ## immune
   expect_equal(scae_subset(scae, "immune_genes"), scae_a_genes)
-  #functional
+  ## functional
   expect_equal(scae_subset(scae, "functional_groups"), scae_functional)
 
   msg <- "Invalid layer specified, Choose from `nonimmune`, `alleles`, `immune_genes`, `functional_groups`"
