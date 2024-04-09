@@ -11,9 +11,9 @@ alleles2genes(sce, lookup, exp_type, gene_symbols)
 
 \item{lookup}{A data.frame object containing the lookup table.}
 
-\item{exp_type}{A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.}
+\item{exp_type}{A character string determining whether the gene symbols in the input data are Ensembl identifiers or ncbi identifiers. Only used internally, not related to input done by the user.}
 
-\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.}
+\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBL gene identifiers.}
 }
 \value{
 A SingleCellExperiment object.

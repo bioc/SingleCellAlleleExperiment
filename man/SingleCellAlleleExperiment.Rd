@@ -31,7 +31,7 @@ SingleCellAlleleExperiment(
 
 \item{log}{binary if user wants to compute \code{logcounts} assay.}
 
-\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.}
+\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBL gene identifiers.}
 
 \item{verbose}{A logical parameter to decide if runtime-messages should be shown during function execution.
 Use \code{FALSE} if no info runtime-messages should be shown (default), and \code{TRUE} for showing runtime-messages.}
