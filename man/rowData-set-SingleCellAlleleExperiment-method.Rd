@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{A SingleCellAlleleExperiment object}
 
-\item{...}{additional paramaters passed to rowData<-}
+\item{...}{additional parameters passed to rowData<-}
 
 \item{value}{arbitrary value (can be integer, character,..)}
 }

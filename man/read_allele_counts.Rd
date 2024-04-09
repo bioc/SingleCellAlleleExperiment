@@ -39,7 +39,7 @@ The value \code{"no"} computes the knee plot and stops function execution. This 
 
 \item{log}{A logical parameter to decide if logcounts assay should be computed based on library factors computed with \code{scuttle::computeLibraryFactors()}.}
 
-\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.}
+\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBL gene identifiers.}
 
 \item{verbose}{A logical parameter to decide if runtime-messages should be shown during function execution. Use \code{FALSE} if no info runtime-messages should be shown (default), and \code{TRUE} for showing runtime-messages.}
 
