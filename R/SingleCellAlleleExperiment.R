@@ -370,7 +370,7 @@ genes2functional <- function(sce, lookup, exp_type, gene_symbols){
 
   rn_g2f <- rownames(gene2func_counts)
   rn_g2f <- gene_func_names
-  uniqs <- unique(rn_g2f )
+  uniqs <- unique(rn_g2f)
   gene_func <- matrix(0, nrow=length(uniqs), ncol=ncol(sce[1,]))
   rownames(gene_func) <- uniqs
 

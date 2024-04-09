@@ -140,7 +140,7 @@ scae_subset <- function(scae, subset=c("nonimmune", "alleles", "immune_genes", "
 
 #' rowData setter
 #' @param x A SingleCellAlleleExperiment object
-#' @param ... additional paramaters passed to rowData<-
+#' @param ... additional parameters passed to rowData<-
 #' @param value arbitrary value (can be integer, character,..)
 #'
 #' @importFrom SummarizedExperiment "rowData<-"
