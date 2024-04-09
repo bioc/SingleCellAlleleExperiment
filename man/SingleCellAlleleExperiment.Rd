@@ -92,15 +92,15 @@ scae
 ##-OR, use the read in function `read_allele_counts()` !![RECOMMENDED]!!
 ##-Find more examples in its documentation using `?read_allele_counts`
 
-scae_2 <- read_allele_counts(example_data_5k$dir,
-                             sample_names="example_data",
-                             filter_mode="no",
-                             lookup_file=lookup,
-                             barcode_file=example_data_5k$barcodes,
-                             gene_file=example_data_5k$features,
-                             matrix_file=example_data_5k$matrix,
-                             verbose=TRUE)
+# scae_2 <- read_allele_counts(example_data_5k$dir,
+#                              sample_names="example_data",
+#                              filter_mode="no",
+#                              lookup_file=lookup,
+#                              barcode_file=example_data_5k$barcodes,
+#                              gene_file=example_data_5k$features,
+#                              matrix_file=example_data_5k$matrix,
+#                              verbose=TRUE)
 
-scae_2
+# scae_2
 
 }
