@@ -26,7 +26,7 @@
 #' @param matrix_file A character string determining the name of the file containing the count matrix.
 #' @param filter_threshold An integer value used as a threshold for filtering low-quality barcodes/cells. Standard value is `NULL` when using `filter = c("yes", "no")`. Value must be provided when using `filter = "custom"`.
 #' @param log A logical parameter to decide if logcounts assay should be computed based on library factors computed with `scuttle::computeLibraryFactors()`.
-#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
+#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBL gene identifiers.
 #' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution. Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
 #' @importFrom BiocParallel SerialParam bplapply
