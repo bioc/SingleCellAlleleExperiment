@@ -294,7 +294,7 @@ Three optional functionalities can be toggled on or off during read in:
 
  - Optional filtering performed on the inflection point of a computed knee plot based on barcode ranks. Use `filter_mode="yes"` for this optional filter mode. Find more information about the different filter modes in the prior section.
  - Computation of a `logcounts` assay using Library Factors. Use `log=TRUE/FALSE` to toggle on or off accordingly. **Turned on by default**. If you want to compute the logcounts using a different method, be aware that the count matrix is extended (adding additional rows) during the object generation, **its abundant to compute scaling factors only on data layers present in the raw data (non-immune and alleles)**. Otherwise the scaling factors would not be correct. Find information about subsetting the object in sections further below.
- - Computation of additional gene symbols in case the raw data only contains Ensemble gene identifiers. Use `gene_symbols=TRUE/FALSE` to toggle on or off accordingly. **Turned off by default**. Uses the org.HS package.
+ - Computation of additional gene symbols in case the raw data only contains Ensembl gene identifiers. Use `gene_symbols=TRUE/FALSE` to toggle on or off accordingly. **Turned off by default**. Uses the org.HS package.
 
 <hr>
 

@@ -16,7 +16,7 @@
 #' @param threshold An integer value used as a threshold for filtering low-quality barcodes/cells.
 #' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
 #' @param log binary if user wants to compute `logcounts` assay.
-#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
+#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBL gene identifiers.
 #' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
 #'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
@@ -159,7 +159,7 @@ SingleCellAlleleExperiment <- function(...,
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object. Object is initially constructed in the `SingleCellAlleleExperiment` constructor.
 #' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
-#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
+#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBL gene identifiers.
 #' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
 #'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
 #'
@@ -291,8 +291,8 @@ get_allelecounts <- function(sce, lookup){
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
-#' @param exp_type A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
-#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
+#' @param exp_type A character string determining whether the gene symbols in the input data are Ensembl identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
+#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBL gene identifiers.
 #'
 #' @importFrom SingleCellExperiment rowData colData SingleCellExperiment rbind
 #' @importFrom SummarizedExperiment rowData<- colData<-
@@ -346,8 +346,8 @@ alleles2genes <- function(sce, lookup, exp_type, gene_symbols){
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
-#' @param exp_type A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
-#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
+#' @param exp_type A character string determining whether the gene symbols in the input data are Ensembl identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
+#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBL gene identifiers.
 #'
 #' @importFrom SingleCellExperiment colData counts SingleCellExperiment rbind
 #' @importFrom SummarizedExperiment colData<- rowData<-
