@@ -13,6 +13,9 @@
 
 \item{value}{arbitrary value (can be integer, character,..)}
 }
+\value{
+SingleCellAlleleExperiment object
+}
 \description{
 rowData setter
 }
