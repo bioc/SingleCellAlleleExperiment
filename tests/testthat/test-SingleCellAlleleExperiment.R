@@ -20,7 +20,8 @@ sce_filter_raw <- SingleCellExperiment(assays = list(counts=mat),
                                        rowData = feature_info,
                                        colData = cell_names)
 
-# perform zero-filtering on colSums in the example dataset as this is the necessary default performed in the constructor
+## perform zero-filtering on colSums in the example dataset
+## this is the necessary default performed in the constructor
 filtered_sce_raw <- sce_filter_raw[, colSums(counts(sce_filter_raw)) > 0]
 cell_names <- cell_names[1:length(colData(filtered_sce_raw)$V1), ]
 cell_names <- as.data.frame(cell_names)
@@ -49,9 +50,9 @@ test_that("validty test", {
   expect_error(rowData(scae)$NI_I <- NULL, regexp="")
   expect_error(rowData(scae)$Quant_type <- "random_value", regexp="")
 
-  # change 'NI_I' column
+  ## change 'NI_I' column
   expect_error(colnames(rowData(scae))[2] <- "arbitrary_name")
-  # change 'Quant_type' column
+  ## change 'Quant_type' column
   expect_error(colnames(rowData(scae))[3] <- "arbitrary_name")
 })
 
@@ -60,39 +61,38 @@ test_that("rownames and rowData check", {
 
   rn_ni_genes <- rownames(get_nigenes(scae))
   rn_alleles <- rownames(scae_subset_alleles(scae))
-  #check the names
+  ## check the names
   expect_equal(feature_info$V1,
                rownames(rowData(scae[c(rn_ni_genes, rn_alleles),])))
 
-  #check if roWData and object rownames are equal
+  ## check if roWData and object rownames are equal
   expect_equal(rownames(scae[c(rn_ni_genes, rn_alleles),]),
                rownames(rowData(scae[c(rn_ni_genes, rn_alleles),])))
 
-  #check the dimension
+  ## check the dimension
   expect_equal(length(feature_info$V1),
                length(rownames(scae[c(rn_ni_genes, rn_alleles),])))
 
 })
 
 test_that("colnames and colData check", {
-  #check the names
+  ## check the names
   rn_ni_genes <- rownames(get_nigenes(scae))
   rn_alleles <- rownames(scae_subset_alleles(scae))
 
   expect_equal(rownames(colData(scae)), cell_names$V1)
 
-  #check if colData and object colnames are equal
+  ## check if colData and object colnames are equal
   expect_equal(colnames(scae[c(rn_ni_genes, rn_alleles),]),
                rownames(colData(scae[c(rn_ni_genes, rn_alleles),])))
 
-  #check the dimension
+  ## check the dimension
   expect_equal(length(colnames(scae[c(rn_ni_genes, rn_alleles),])),
                length(cell_names$V1))
 })
 
-#TODO check for logcounts too
 test_that("assay check", {
-  #dim-check
+  ## dim-check
   expect_equal(dim(counts(scae)[1:dim(mat_filtered_zero)[1],]),
                dim(mat_filtered_zero))
 
@@ -101,17 +101,17 @@ test_that("assay check", {
   random_num1 <- sample(1:dim(mat_filtered_zero)[1], 1)
   random_num2 <- sample(1:dim(mat_filtered_zero)[2], 1)
 
-  #check if random entry is equal
+  ## check if random entry is equal
   expect_equal(counts(scae_no_immune_layers)[random_num1, random_num2],
                mat_filtered_zero[random_num1, random_num2])
 
   expect_type(scae, "S4")
 })
 
-#test different filter/no-filter modes
+## Test different filter/no-filter modes
 test_that("check input-parameter errors", {
 
-  #Testing for the error message of the filter_mode="custom" mode if threshold is not set
+  ## Testing error message of the filter_mode="custom" if threshold is not set
   expect_error(read_allele_counts(example_data_5k$dir,
                                   sample_names="example_data_wta",
                                   filter_mode="custom",
@@ -123,8 +123,8 @@ test_that("check input-parameter errors", {
                                   verbose=FALSE),
                regexp = "")
 
-  #Testing for the correct output message of the filter_mode="yes" mode
-
+  ## Testing for the correct output message of the filter_mode="yes",
+  ## also testing for error message if package is not installed
   if (!requireNamespace("DropletUtils", quietly=TRUE)) {
     expect_error(read_allele_counts(example_data_5k$dir,
                                       sample_names="example_data_wta",
@@ -151,8 +151,8 @@ test_that("check input-parameter errors", {
 
 
 
-  #Testing for the correct output message of the filter_mode="yes" mode
-
+  ## Testing error/output message for `log=TRUE`
+  ## also testing for error message if package is not installed
   if (!requireNamespace("scuttle", quietly=TRUE)) {
     expect_error(read_allele_counts(example_data_5k$dir,
                                     sample_names="example_data_wta",
@@ -164,7 +164,7 @@ test_that("check input-parameter errors", {
                                     filter_threshold=NULL,
                                     log=TRUE,
                                     verbose=TRUE),
-                 regexp = "")
+                 regexp="")
   }else {
     expect_message(read_allele_counts(example_data_5k$dir,
                                       sample_names="example_data_wta",
@@ -176,13 +176,13 @@ test_that("check input-parameter errors", {
                                       filter_threshold=NULL,
                                       log=TRUE,
                                       verbose=TRUE),
-                   regexp = "    Generating SingleCellAlleleExperiment object:
-                   Generate logcounts assay using Library Factors")
+                   regexp="  Generating SCAE object: Generate logcounts assay using Library Factors")
   }
 
 
-
-  if (!requireNamespace("scuttle", quietly=TRUE)) {
+  ## Testing error/output message for `gene_symbols=TRUE`
+  ## also testing for error message if package is not installed
+  if (!requireNamespace("org.Hs.eg.db", quietly=TRUE)) {
     expect_error(read_allele_counts(example_data_5k$dir,
                                     sample_names="example_data_wta",
                                     filter_mode="no",
@@ -191,9 +191,9 @@ test_that("check input-parameter errors", {
                                     gene_file=example_data_5k$features,
                                     matrix_file=example_data_5k$matrix,
                                     filter_threshold=NULL,
-                                    log=TRUE,
+                                    gene_symbols=TRUE,
                                     verbose=TRUE),
-                 regexp = "")
+                 regexp="")
   }else {
     expect_message(read_allele_counts(example_data_5k$dir,
                                       sample_names="example_data_wta",
@@ -203,15 +203,12 @@ test_that("check input-parameter errors", {
                                       gene_file=example_data_5k$features,
                                       matrix_file=example_data_5k$matrix,
                                       filter_threshold=NULL,
-                                      log=TRUE,
+                                      gene_symbols=TRUE,
                                       verbose=TRUE),
-                   regexp = "    Generating SingleCellAlleleExperiment object:
-                   Generate logcounts assay using Library Factors")
+                   regexp="Using org.Hs to retrieve NCBI gene identifiers.")
   }
 
-
-  #leave this out
-  #Testing for the correct output message of the filter_mode="no" mode
+  ## Testing for the correct output message of the filter_mode="no"
   expect_message(read_allele_counts(example_data_5k$dir,
                                     sample_names="example_data_wta",
                                     filter_mode="no",

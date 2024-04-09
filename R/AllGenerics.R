@@ -1,3 +1,1 @@
 # SingleCellAlleleExperiment methods --------------------------------------
-
-

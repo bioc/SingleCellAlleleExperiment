@@ -10,11 +10,11 @@ validSingleCellAlleleExperiment <- function(scae_object) {
   }
 
   if (sum(!rowData(scae_object)$NI_I %in% c("NI", "I"))>0){
-    msg <- c(msg, "Extended rowData column 'NI_I' contains invalid values")
+    msg <- c(msg, "Extended rowData column 'NI_I' contains invalid values. Only \"NI\" and \"I\" are valid.")
   }
 
   if (sum(!rowData(scae_object)$Quant_type %in% c("A", "G", "F"))>0){
-    msg <- c(msg, "Extended rowData column 'Quant_type' contains invalid values")
+    msg <- c(msg, "Extended rowData column 'Quant_type' contains invalid values. Only \"A\", \"G\" and \"F\" are valid.")
   }
 
   if (is.null(msg)) {
