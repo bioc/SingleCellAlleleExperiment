@@ -5,7 +5,7 @@
 \alias{SingleCellAlleleExperiment-class}
 \alias{.scae}
 \alias{SingleCellAlleleExperiment}
-\title{Constructor SingleCellAlleleExperiment class}
+\title{The SingleCellAlleleExperiment class}
 \usage{
 SingleCellAlleleExperiment(
   ...,
@@ -19,32 +19,61 @@ SingleCellAlleleExperiment(
 )
 }
 \arguments{
-\item{...}{Arguments passed to the \code{\link{SingleCellExperiment}} constructor to fill the slots of the SCE-class.}
+\item{...}{Arguments passed to the \code{\link{SingleCellExperiment}}
+constructor to fill the slots of the SCE-class.}
 
 \item{lookup}{A data.frame object containing the lookup table.}
 
-\item{metadata}{potential information regarding plotting a knee plot for quality control.}
+\item{metadata}{A list containing a dataframe and two integer values of
+information regarding plotting a knee plot for quality control. This parameter
+is linked to \code{filter_mode="yes"} in the \code{read_allele_counts()} function.}
 
-\item{threshold}{An integer value used as a threshold for filtering low-quality barcodes/cells.}
+\item{threshold}{An integer value used as a threshold for filtering
+low-quality barcodes/cells.}
 
-\item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
+\item{exp_type}{Internal character string parameter that determines in which
+format the gene symbols in the input data are. Can be \code{c("ENS","noENS")}}
 
-\item{log}{binary if user wants to compute \code{logcounts} assay.}
+\item{log}{A logical parameter which determines if the user wants to
+compute the \code{logcounts} assay.}
 
-\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.}
+\item{gene_symbols}{A logical parameter to decide whether to compute additional
+gene gene symbols in case the raw data only contains ENSEMBL gene identifiers.}
 
-\item{verbose}{A logical parameter to decide if runtime-messages should be shown during function execution.
-Use \code{FALSE} if no info runtime-messages should be shown (default), and \code{TRUE} for showing runtime-messages.}
+\item{verbose}{A logical parameter to decide if runtime-messages should be
+shown during function execution. Use \code{FALSE} if no info runtime-messages
+should be shown (default), and \code{TRUE} for showing runtime-messages.}
 }
 \value{
 A SingleCellAlleleExperiment object.
 }
 \description{
-Constructor for the \code{SingleCellAllelExperiment} (SCAE) class.
-Constructor is used in the read in function \code{read_allele_counts()}. Performing all necessary steps to transform
-a \code{SingleCellExperiment} object into the extended \code{SingleCellAlleleExperiment} object. SCAE objects
-contain allele, gene and functional level quantification results. The additional layers are stored as additional
-rows in the count assays as well as in extended rowData.
+The SingleCellAlleleExperiment class is a comprehensive multi-layer data
+structure, enabling the representatino of immune genes at specific levels,
+including alleles, genes and groups of functionally similar genes. This data
+representation allows data handling and data analysis across these
+immunological relevant, different layers of annotation.
+}
+\details{
+The SingleCellAlleleExperiment class builds upon and extends the data
+representation that can be facilitated using a \code{\link{SingleCellExperiment}}
+object.
+
+The Constructor \code{SingleCellAlleleExperiment()} can be used on its own,
+if raw data is processed accordingly (see examples) OR in a more
+convenient way using this packages read in function \code{read_allele_counts()}
+
+A getter function \code{scae_subset()} allows to subset the object according to
+the newly implemented layers.
+
+In this class, similar to the \code{\link{SingleCellExperiment}} class,
+rows should represent genomic features (including immune genes, represented
+as allele information), while columns represent single cells/barcodes.
+
+The SingleCellAlleleExperiment data structure serves as a data representation
+for data generated with the \code{scIGD} workflow.
+This workflow allows for the quantification of expression and interactive
+exploration of donor-specific alleles of different immune genes and its
 }
 \examples{
 ##-If you want to use the Constructor on its own, some preprocessing is
@@ -88,7 +117,6 @@ scae <- SingleCellAlleleExperiment(assays=list(counts=sparse_mat),
 
 scae
 
-
 ##-OR, use the read in function `read_allele_counts()` !![RECOMMENDED]!!
 ##-Find more examples in its documentation using `?read_allele_counts`
 
@@ -103,4 +131,9 @@ scae
 
 # scae_2
 
+}
+\seealso{
+\code{\link[=read_allele_counts]{read_allele_counts()}}
+
+\code{\link[=scae_subset]{scae_subset()}}
 }

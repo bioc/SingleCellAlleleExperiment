@@ -2,27 +2,26 @@
 % Please edit documentation in R/SingleCellAlleleExperiment.R
 \name{ext_rd}
 \alias{ext_rd}
-\title{Extending rowData}
+\title{Extend rowData with new annotation columns}
 \usage{
 ext_rd(sce, exp_type, gene_symbols, verbose = FALSE)
 }
 \arguments{
-\item{sce}{A \code{\link{SingleCellExperiment}} object. Object is initially constructed in the \code{SingleCellAlleleExperiment} constructor.}
+\item{sce}{A \code{\link{SingleCellExperiment}} object.}
 
-\item{exp_type}{A vector containing two character strings. Either \code{"WTA"} or \code{"Amplicon"} are valid inputs. Choose one depending on the used transcriptomics approach.}
+\item{exp_type}{Internal character string parameter that determines in which
+format the gene symbols in the input data are. Can be \code{c("ENS","noENS")}}
 
-\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.}
+\item{gene_symbols}{A logical parameter to decide whether to compute additional
+gene gene symbols in case the raw data only contains ENSEMBL gene identifiers.}
 
-\item{verbose}{A logical parameter to decide if runtime-messages should be shown during function execution.
-Use \code{FALSE} if no info runtime-messages should be shown (default), and \code{TRUE} for showing runtime-messages.}
+\item{verbose}{A logical parameter to decide if runtime-messages should be
+shown during function execution. Use \code{FALSE} if no info runtime-messages
+should be shown (default), and \code{TRUE} for showing runtime-messages.}
 }
 \value{
-A SingleCellExperiment object.
+A SingleCellExperiment object
 }
 \description{
-Internal function used in the \code{SingleCellAlleleExperiment()} constructor adding information to the SingleCellAlleleExperiment object by
-extending the rowData by two columns. \code{NI_I} is a classifier for each feature_row if its considered a
-non-immune (NI) or immune (I) gene. \code{Quant_type} is a classifier for determining which row is related to which
-subassay of the extended main assay in the \code{SingleCellAlleleExperiment}. "A" corresponds to allele, "G" to allele gene and
-"F" to functional allele class.
+Extend rowData with new annotation columns
 }
