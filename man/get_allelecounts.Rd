@@ -12,10 +12,10 @@ get_allelecounts(sce, lookup)
 \item{lookup}{A data.frame object containing the lookup table.}
 }
 \value{
-A SingleCellExperiment object.
+A SingleCellExperiment object
 }
 \description{
-Internal function used to build a subassay containing counts from raw alleles
-The rownames  of this subassay are already translated to the corresponding allele gene identifier, which
-are extracted from the allele lookup table
+Internal function used to build a subassay containing counts from raw alleles.
+The rownames  of this subassay are already translated to the corresponding
+immune gene identifier, which are extracted from the lookup table.
 }
