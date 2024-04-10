@@ -139,10 +139,12 @@ library(SingleCellAlleleExperiment)
 library(scaeData)
 library(scater)
 library(scran)
-library(patchwork)
+library(scuttle)
 library(DropletUtils)
 library(ggplot2)
-
+library(patchwork)
+library(org.Hs.eg.db)
+library(AnnotationDbi)
 ```
 
 ## Generation of a SingleCellAlleleExperiment object
