@@ -63,7 +63,6 @@ However, interactive single-cell methods commonly used to analyze immune cells i
 ## Workflow for unraveling the immunogenetic diversity in scData
 
 We have developed a workflow that allows quantification of expression and interactive exploration of donor-specific alleles of different immune genes. The workflow is divided into two software packages and one additional data package: 
->>>>>>> 51cbe7b442f8538a050b266bbd0173d8cc30f155
 
 1. The `r BiocStyle::Githubpkg(repo="AGImkeller/scIGD", pkg="scIGD")` software package consist of a *[Snakemake](https://snakemake.readthedocs.io/en/stable/)* workflow designed to automate and streamline the genotyping process for immune genes, focusing on key targets such as HLAs and KIRs, and enabling allele-specific quantification from single-cell RNA-sequencing (scRNA-seq) data using donor-specific references. For detailed information of the performed steps and how to utilize this workflow, please refer to its documentation here: `r BiocStyle::Githubpkg(repo="AGImkeller/scIGD", pkg="scIGD")`.
 
