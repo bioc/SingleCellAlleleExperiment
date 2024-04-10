@@ -1,24 +1,58 @@
 
-#---------SingleCellAlleleExperiment constructor----------#
-
-#' Constructor SingleCellAlleleExperiment class
+#' The SingleCellAlleleExperiment class
 #'
-#' @description
-#' Constructor for the `SingleCellAllelExperiment` (SCAE) class.
-#' Constructor is used in the read in function `read_allele_counts()`. Performing all necessary steps to transform
-#' a `SingleCellExperiment` object into the extended `SingleCellAlleleExperiment` object. SCAE objects
-#' contain allele, gene and functional level quantification results. The additional layers are stored as additional
-#' rows in the count assays as well as in extended rowData.
+#' The SingleCellAlleleExperiment class is a comprehensive multi-layer data
+#' structure, enabling the representatino of immune genes at specific levels,
+#' including alleles, genes and groups of functionally similar genes. This data
+#' representation allows data handling and data analysis across these
+#' immunological relevant, different layers of annotation.
 #'
-#' @param ... Arguments passed to the \code{\link{SingleCellExperiment}} constructor to fill the slots of the SCE-class.
+#' The SingleCellAlleleExperiment class builds upon and extends the data
+#' representation that can be facilitated using a \code{\link{SingleCellExperiment}}
+#' object.
+#'
+#' The Constructor `SingleCellAlleleExperiment()` can be used on its own,
+#' if raw data is processed accordingly (see examples) OR in a more
+#' convenient way using this packages read in function `read_allele_counts()`
+#'
+#' A getter function `scae_subset()` allows to subset the object according to
+#' the newly implemented layers.
+#'
+#'
+#' @seealso [read_allele_counts()]
+#' @seealso [scae_subset()]
+#'
+#' @param ... Arguments passed to the \code{\link{SingleCellExperiment}}
+#' constructor to fill the slots of the SCE-class.
 #' @param lookup A data.frame object containing the lookup table.
-#' @param metadata potential information regarding plotting a knee plot for quality control.
-#' @param threshold An integer value used as a threshold for filtering low-quality barcodes/cells.
-#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
-#' @param log binary if user wants to compute `logcounts` assay.
-#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
-#' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
-#'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
+#' @param metadata A list containing a dataframe and two integer values of
+#' information regarding plotting a knee plot for quality control. This parameter
+#' is linked to `filter_mode="yes"` in the `read_allele_counts()` function.
+#' @param threshold An integer value used as a threshold for filtering
+#' low-quality barcodes/cells.
+#' @param exp_type Internal character string parameter that determines in which
+#' format the gene symbols in the input data are. Can be `c("ENS","noENS")`
+#' @param log A logical parameter which determines if the user wants to
+#' compute the `logcounts` assay.
+#' @param gene_symbols A logical parameter to decide whether to compute additional
+#' gene gene symbols in case the raw data only contains ENSEMBL gene identifiers.
+#' @param verbose A logical parameter to decide if runtime-messages should be
+#' shown during function execution. Use `FALSE` if no info runtime-messages
+#' should be shown (default), and `TRUE` for showing runtime-messages.
+#'
+#' @details
+#' In this class, similar to the \code{\link{SingleCellExperiment}} class,
+#' rows should represent genomic features (including immune genes, represented
+#' as allele information), while columns represent single cells/barcodes.
+#'
+#' The SingleCellAlleleExperiment data structure serves as a data representation
+#' for data generated with the `scIGD` workflow.
+#' This workflow allows for the quantification of expression and interactive
+#' exploration of donor-specific alleles of different immune genes and its
+#'
+## @seealso
+## \code{\link{https://github.com/AGImkeller/scIGD/}},
+## for information about the "single-cell ImmunoGenomic Diversity" **scIGD** workflow.
 #'
 #' @importFrom SingleCellExperiment SingleCellExperiment sizeFactors counts
 #' logcounts counts<- logcounts<-
@@ -67,7 +101,6 @@
 #'                                    verbose=TRUE)
 #'
 #' scae
-#'
 #'
 #' ##-OR, use the read in function `read_allele_counts()` !![RECOMMENDED]!!
 #' ##-Find more examples in its documentation using `?read_allele_counts`
@@ -144,41 +177,33 @@ SingleCellAlleleExperiment <- function(...,
 }
 
 
-#--------------------Functions used in the SCAE-Constructor--------------------#
+##-----------------Internal functions used in the SCAE-Constructo-------------##
+##-1--------------------------------ext_rd------------------------------------##
 
-#-1--------------------------------ext_rd--------------------------------------#
-
-#' Extending rowData
-#'
-#' @description
-#' Internal function used in the `SingleCellAlleleExperiment()` constructor adding information to the SingleCellAlleleExperiment object by
-#' extending the rowData by two columns. `NI_I` is a classifier for each feature_row if its considered a
-#' non-immune (NI) or immune (I) gene. `Quant_type` is a classifier for determining which row is related to which
-#' subassay of the extended main assay in the `SingleCellAlleleExperiment`. "A" corresponds to allele, "G" to allele gene and
-#' "F" to functional allele class.
-#'
-#' @param sce A \code{\link{SingleCellExperiment}} object. Object is initially constructed in the `SingleCellAlleleExperiment` constructor.
-#' @param exp_type A vector containing two character strings. Either `"WTA"` or `"Amplicon"` are valid inputs. Choose one depending on the used transcriptomics approach.
-#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
-#' @param verbose A logical parameter to decide if runtime-messages should be shown during function execution.
-#'  Use `FALSE` if no info runtime-messages should be shown (default), and `TRUE` for showing runtime-messages.
-#'
+#' Extend rowData with new annotation columns
+#' @param sce A \code{\link{SingleCellExperiment}} object.
+#' @param exp_type Internal character string parameter that determines in which
+#' format the gene symbols in the input data are. Can be `c("ENS","noENS")`
+#' @param gene_symbols A logical parameter to decide whether to compute additional
+#' gene gene symbols in case the raw data only contains ENSEMBL gene identifiers.
+#' @param verbose A logical parameter to decide if runtime-messages should be
+#' shown during function execution. Use `FALSE` if no info runtime-messages
+#' should be shown (default), and `TRUE` for showing runtime-messages.
 #' @importFrom SummarizedExperiment rowData<-
 #' @importFrom SingleCellExperiment rowData
-#'
-#' @return A SingleCellExperiment object.
+#' @return A SingleCellExperiment object
 ext_rd <- function(sce, exp_type, gene_symbols, verbose=FALSE){
 
   allele_names_all <- find_allele_ids(sce)
 
-  # Group of genes for which extended informaton is stored
+  ## Group of genes for which extended informaton is stored
   rowData(sce[allele_names_all,])$NI_I <- "I"
-  # Allele level
+  ## Allele level
   rowData(sce[allele_names_all,])$Quant_type <- "A"
-  # Group of genes for which classical (gene level) informaton is stored
+  ## Group of genes for which classical (gene level) informaton is stored
   rn_in_alleles <- rownames(sce) %in% allele_names_all
   rowData(sce)[!(rn_in_alleles), ]$NI_I <- "NI"
-  # Gene level
+  ## Gene level
   rowData(sce)[!(rn_in_alleles), ]$Quant_type <- "G"
 
   if (exp_type == "ENS" && gene_symbols){
@@ -193,18 +218,11 @@ ext_rd <- function(sce, exp_type, gene_symbols, verbose=FALSE){
   sce
 }
 
-# Code provided by Ahmad Al Ajami
+## Code provided by Ahmad Al Ajami
 #' Get NCBI genes using the org.HS.db package
-#'
-#' @description
-#' This internal function is not as accurate (does not retrieve as many gene names as `biomaRt`) but can be used without
-#' internet connection.
-#'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
-#'
 #' @importFrom methods as
 #' @importFrom SingleCellExperiment rowData
-#'
 #' @return A list of character strings for gene names.
 get_ncbi_org <- function(sce){
   ensembl_ids <- rowData(sce)$Ensembl_ID
@@ -226,19 +244,18 @@ get_ncbi_org <- function(sce){
 }
 
 
-#-3-----------------------------allele2genes-----------------------------------#
+##-2-----------------------------allele2genes---------------------------------##
 
-#' Identify rows containing allele information for WTA
+#' Identify rows containing allele information
 #'
 #' @description
-#' Internal function used in `get_allelecounts()` to subsample the quantification assay and only
-#' return the rows specifying allele-quantification information.
+#' Internal function used in `get_allelecounts()` to subsample the
+#' quantification assay and only return the rows specifying
+#' allele-quantification information.
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
-#'
 #' @importFrom SingleCellExperiment counts
-#'
-#' @return A SingleCellExperiment object.
+#' @return A SingleCellExperiment object
 find_allele_ids <- function(sce){
   rn_counts_sce <- rownames(counts(sce))
   a <- grepl("*", rn_counts_sce, fixed=TRUE)
@@ -253,16 +270,14 @@ find_allele_ids <- function(sce){
 #' Get Subassay with allele gene names and raw allele quantification
 #'
 #' @description
-#' Internal function used to build a subassay containing counts from raw alleles
-#' The rownames  of this subassay are already translated to the corresponding allele gene identifier, which
-#' are extracted from the allele lookup table
+#' Internal function used to build a subassay containing counts from raw alleles.
+#' The rownames  of this subassay are already translated to the corresponding
+#' immune gene identifier, which are extracted from the lookup table.
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
-#'
 #' @importFrom SingleCellExperiment counts
-#'
-#' @return A SingleCellExperiment object.
+#' @return A SingleCellExperiment object
 get_allelecounts <- function(sce, lookup){
 
   allele_ids_lookup <- find_allele_ids(sce)
@@ -284,22 +299,23 @@ get_allelecounts <- function(sce, lookup){
 #' Building first new subassay for SingleCellAllelexperiment object
 #'
 #' @description
-#' Internal function for the first assay extension used in the `SingleCellAlleleExperiment()` constructor
-#' computing the first of the two new subassays that get appended to the
-#' quantification assay. This subassay contains the allele gene identifiers instead of the allele identifiers and
-#' sums up the expression counts of alleles that have the same allele gene identifiers.
+#' Internal function for the first assay extension used in the
+#' `SingleCellAlleleExperiment()` constructor, computing the first of the two
+#' new subassays that get appended to the quantification assay.
+#' This subassay contains the allele gene identifiers instead of the
+#' allele identifiers present in the raw data and sums up the expression counts
+#' of alleles that have the same allele gene identifiers.
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
-#' @param exp_type A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
-#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
-#'
+#' @param exp_type Internal character string parameter that determines in which
+#' format the gene symbols in the input data are. Can be `c("ENS","noENS")`
+#' @param gene_symbols A logical parameter to decide whether to compute additional
+#' gene gene symbols in case the raw data only contains ENSEMBL gene identifiers.
 #' @importFrom SingleCellExperiment rowData colData SingleCellExperiment rbind
 #' @importFrom SummarizedExperiment rowData<- colData<-
 #' @importFrom Matrix colSums
-#'
-#'
-#' @return A SingleCellExperiment object.
+#' @return A SingleCellExperiment object
 alleles2genes <- function(sce, lookup, exp_type, gene_symbols){
 
   v_acounts <- get_allelecounts(sce, lookup)
@@ -334,29 +350,31 @@ alleles2genes <- function(sce, lookup, exp_type, gene_symbols){
   return(new_sce)
 }
 
-#-4------------------------------genes2func------------------------------------#
+
+##-3------------------------------genes2func----------------------------------##
 
 #' Building second new subassay for the SingleCellAlleleExperiment object
 #'
 #' @description
-#' Internal function for the second assay extension used in the `SingleCellAlleleExperiment()` constructor
-#' computing the second of the two new subassays that get appended to the
-#' quantification assay. This subassay contains the functional allele classes and
-#' sums up the expression counts of the allele genes that are in the same functional group.
+#' Internal function for the second assay extension used in the
+#' `SingleCellAlleleExperiment()` constructor, computing the second of the two
+#' new subassays that get appended to the quantification assay. This subassay
+#' contains the functional allele classes and sums up the expression counts of
+#' the allele genes that are in the same functional group.
 #'
 #' @param sce A \code{\link{SingleCellExperiment}} object.
 #' @param lookup A data.frame object containing the lookup table.
-#' @param exp_type A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.
-#' @param gene_symbols A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.
-#'
+#' @param exp_type Internal character string parameter that determines in which
+#' format the gene symbols in the input data are. Can be `c("ENS","noENS")`
+#' @param gene_symbols A logical parameter to decide whether to compute additional
+#' gene gene symbols in case the raw data only contains ENSEMBL gene identifiers.
 #' @importFrom SingleCellExperiment colData counts SingleCellExperiment rbind
 #' @importFrom SummarizedExperiment colData<- rowData<-
 #' @importFrom Matrix colSums
-#'
-#' @return A SingleCellExperiment object.
+#' @return A SingleCellExperiment object
 genes2functional <- function(sce, lookup, exp_type, gene_symbols){
 
-  #find functional classes for each gene
+  ## find functional classes for each gene
   gene_names <- rownames(get_agenes(sce))
 
   list_func  <- list()
@@ -370,7 +388,7 @@ genes2functional <- function(sce, lookup, exp_type, gene_symbols){
 
   rn_g2f <- rownames(gene2func_counts)
   rn_g2f <- gene_func_names
-  uniqs <- unique(rn_g2f )
+  uniqs <- unique(rn_g2f)
   gene_func <- matrix(0, nrow=length(uniqs), ncol=ncol(sce[1,]))
   rownames(gene_func) <- uniqs
 
@@ -391,9 +409,9 @@ genes2functional <- function(sce, lookup, exp_type, gene_symbols){
   final_scae <- SingleCellExperiment::rbind(sce, func_sce)
   uniq_func_sce <- rownames(final_scae) %in% uniqs
 
-  # Genes with extended quantification
+  ## Genes with extended quantification
   rowData(final_scae[uniq_func_sce])$NI_I <- "I"
-  # Functional level
+  ## Functional level
   rowData(final_scae[uniq_func_sce])$Quant_type <- "F"
   final_scae
 }

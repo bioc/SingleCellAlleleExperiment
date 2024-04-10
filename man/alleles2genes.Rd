@@ -11,16 +11,20 @@ alleles2genes(sce, lookup, exp_type, gene_symbols)
 
 \item{lookup}{A data.frame object containing the lookup table.}
 
-\item{exp_type}{A character string determining whether the gene symbols in the input data are Ensemble identifiers or ncbi identifiers. Only used internally, not related to input done by the user.}
+\item{exp_type}{Internal character string parameter that determines in which
+format the gene symbols in the input data are. Can be \code{c("ENS","noENS")}}
 
-\item{gene_symbols}{A logical parameter to decide whether to compute the NCBI gene names in case the raw data only contains ENSEMBLE gene identifiers.}
+\item{gene_symbols}{A logical parameter to decide whether to compute additional
+gene gene symbols in case the raw data only contains ENSEMBL gene identifiers.}
 }
 \value{
-A SingleCellExperiment object.
+A SingleCellExperiment object
 }
 \description{
-Internal function for the first assay extension used in the \code{SingleCellAlleleExperiment()} constructor
-computing the first of the two new subassays that get appended to the
-quantification assay. This subassay contains the allele gene identifiers instead of the allele identifiers and
-sums up the expression counts of alleles that have the same allele gene identifiers.
+Internal function for the first assay extension used in the
+\code{SingleCellAlleleExperiment()} constructor, computing the first of the two
+new subassays that get appended to the quantification assay.
+This subassay contains the allele gene identifiers instead of the
+allele identifiers present in the raw data and sums up the expression counts
+of alleles that have the same allele gene identifiers.
 }
