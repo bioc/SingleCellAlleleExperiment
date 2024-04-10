@@ -7,17 +7,22 @@
 read_from_sparse_allele(path, barcode_file, gene_file, matrix_file)
 }
 \arguments{
-\item{path}{A character string determining the path to the directory containing the input files.}
+\item{path}{A character string determining the path to the directory
+containing the input files.}
 
-\item{barcode_file}{A character string determining the name of the file containing the sample-tag quantification data.}
+\item{barcode_file}{A character string determining the name of the file
+containing the sample-tag quantification data.}
 
-\item{gene_file}{A character string determining the name of the file containing the feature identifiers.}
+\item{gene_file}{A character string determining the name of the file
+containing the feature identifiers.}
 
-\item{matrix_file}{A character string determining the name of the file containing the count matrix.}
+\item{matrix_file}{A character string determining the name of the file
+containing the count matrix.}
 }
 \value{
 A list with three data.frames containing the input data information.
 }
 \description{
-Internal function used in \code{read_allele_counts()} that reads in the data stated in the given directory path.
+Internal function used in \code{read_allele_counts()} that reads in the data
+stated in the given directory path.
 }

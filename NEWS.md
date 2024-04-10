@@ -4,7 +4,12 @@
  - computation of a knee plot and according inflection/knee points now optional
  - computation of new gene-symbols now optional
  
- - minor changes in tests (needs to be extended to test for new optional code)
+ - minor changes in tests (needs to be extended to test for new optional code);
+ also extension of the tests to check new code
+ 
+ - major changes in package structure and organisation
+ 
+ - reworked vignette to include optional features
  
 # SingleCellAlleleExperiment 0.99.3
 
