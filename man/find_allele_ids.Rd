@@ -2,7 +2,7 @@
 % Please edit documentation in R/SingleCellAlleleExperiment.R
 \name{find_allele_ids}
 \alias{find_allele_ids}
-\title{Identify rows containing allele information for WTA}
+\title{Identify rows containing allele information}
 \usage{
 find_allele_ids(sce)
 }
@@ -10,9 +10,10 @@ find_allele_ids(sce)
 \item{sce}{A \code{\link{SingleCellExperiment}} object.}
 }
 \value{
-A SingleCellExperiment object.
+A SingleCellExperiment object
 }
 \description{
-Internal function used in \code{get_allelecounts()} to subsample the quantification assay and only
-return the rows specifying allele-quantification information.
+Internal function used in \code{get_allelecounts()} to subsample the
+quantification assay and only return the rows specifying
+allele-quantification information.
 }
