@@ -17,3 +17,4 @@ setReplaceMethod("rowData", "SingleCellAlleleExperiment", function(x, ..., value
   scae <- callNextMethod()
   methods::validObject(scae)
 })
+
