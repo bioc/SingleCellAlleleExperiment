@@ -128,6 +128,10 @@ SingleCellAlleleExperiment <- function(...,
                                        verbose=FALSE){
   sce <- SingleCellExperiment(...)
 
+  ## input checks for optional package installation of optional functionalities
+  check_valid_optional_package(log=log, gene_symbols=gene_symbols)
+
+
   sce_add_look <- ext_rd(sce, exp_type, gene_symbols, verbose=verbose)
 
   if (verbose){
@@ -210,10 +214,11 @@ ext_rd <- function(sce, exp_type, gene_symbols, verbose=FALSE){
     if (verbose){
       message("Using org.Hs to retrieve NCBI gene identifiers.")
     }
-    gene_symbols <- get_ncbi_org(sce)
-    rowData(sce)$Symbol <- gene_symbols
-    rn_sce <- rownames(rowData(scae_subset_alleles(sce)))
-    rowData(sce)[rn_sce,]$Symbol <- rn_sce
+
+        gene_symbols <- get_ncbi_org(sce)
+        rowData(sce)$Symbol <- gene_symbols
+        rn_sce <- rownames(rowData(scae_subset_alleles(sce)))
+        rowData(sce)[rn_sce,]$Symbol <- rn_sce
   }
   sce
 }
@@ -225,22 +230,23 @@ ext_rd <- function(sce, exp_type, gene_symbols, verbose=FALSE){
 #' @importFrom SingleCellExperiment rowData
 #' @return A list of character strings for gene names.
 get_ncbi_org <- function(sce){
-  ensembl_ids <- rowData(sce)$Ensembl_ID
-  ensembl_ids <- sub("\\..*", "", ensembl_ids)
 
-  Hs_symbol <- org.Hs.eg.db::org.Hs.egSYMBOL
-  Hs_ensembl <- org.Hs.eg.db::org.Hs.egENSEMBL
-  mapped_Hs_genes_symbol <- AnnotationDbi::mappedkeys(Hs_symbol)
-  mapped_Hs_genes_ensembl <- AnnotationDbi::mappedkeys(Hs_ensembl)
-  Hs_symbol_df <- as.data.frame(Hs_symbol[mapped_Hs_genes_symbol])
-  Hs_ensembl_df <- as.data.frame(Hs_ensembl[mapped_Hs_genes_ensembl])
+      ensembl_ids <- rowData(sce)$Ensembl_ID
+      ensembl_ids <- sub("\\..*", "", ensembl_ids)
 
-  Hs_mapping <- merge(Hs_symbol_df, Hs_ensembl_df)
+      Hs_symbol <- org.Hs.eg.db::org.Hs.egSYMBOL
+      Hs_ensembl <- org.Hs.eg.db::org.Hs.egENSEMBL
+      mapped_Hs_genes_symbol <- AnnotationDbi::mappedkeys(Hs_symbol)
+      mapped_Hs_genes_ensembl <- AnnotationDbi::mappedkeys(Hs_ensembl)
+      Hs_symbol_df <- as.data.frame(Hs_symbol[mapped_Hs_genes_symbol])
+      Hs_ensembl_df <- as.data.frame(Hs_ensembl[mapped_Hs_genes_ensembl])
 
-  indic <- match(ensembl_ids, Hs_mapping$ensembl_id)
-  ncbi_symbols <- Hs_mapping$symbol[match(ensembl_ids, Hs_mapping$ensembl_id)]
+      Hs_mapping <- merge(Hs_symbol_df, Hs_ensembl_df)
 
-  return(ncbi_symbols)
+      indic <- match(ensembl_ids, Hs_mapping$ensembl_id)
+      ncbi_symbols <- Hs_mapping$symbol[match(ensembl_ids, Hs_mapping$ensembl_id)]
+
+      return(ncbi_symbols)
 }
 
 

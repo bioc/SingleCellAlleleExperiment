@@ -26,3 +26,30 @@ validSingleCellAlleleExperiment <- function(scae_object) {
 #' @importFrom S4Vectors setValidity2
 S4Vectors::setValidity2("SingleCellAlleleExperiment",
                         validSingleCellAlleleExperiment)
+
+
+#' Check package installtion for optional functionalities
+#'
+#' @param log A logical parameter to decide if logcounts assay should be computed
+#' based on library factors computed with `scuttle::computeLibraryFactors()`.
+#' @param gene_symbols A logical parameter to decide whether to compute additional
+#' gene gene symbols in case the raw data only contains ENSEMBL gene identifiers.
+check_valid_optional_package <- function(log, gene_symbols){
+  if (log){
+    if (!requireNamespace("scuttle", quietly=TRUE)) {
+      stop("Package 'scuttle' needed when using 'log=TRUE'.
+         Install: BiocManager::install(\"scuttle\")")
+    }
+  }
+  if (gene_symbols){
+    if (!requireNamespace("org.Hs.eg.db", quietly=TRUE)){
+      stop("Package \"org.Hs.eg.db\" needed when using 'gene_symbols=TRUE'.
+              Install: BiocManager::install(\"org.Hs.eg.db\")")
+    }
+    if (!requireNamespace("AnnotationDbi", quietly=TRUE)){
+      stop("Package \"AnnotationDbi\" needed when using 'gene_symbols=TRUE'.
+              Install: BiocManager::install(\"org.Hs.eg.db\")")
+    }
+  }
+}
+
