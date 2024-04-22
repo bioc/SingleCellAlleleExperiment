@@ -2,17 +2,20 @@
 % Please edit documentation in R/validity.R
 \name{check_valid_optional_package}
 \alias{check_valid_optional_package}
-\title{Check package installtion for optional functionalities}
+\title{Check package installation for optional functionalities}
 \usage{
 check_valid_optional_package(log, gene_symbols)
 }
 \arguments{
-\item{log}{A logical parameter to decide if logcounts assay should be computed
+\item{log}{A logical parameter to decide if a logcounts assay should be computed
 based on library factors computed with \code{scuttle::computeLibraryFactors()}.}
 
 \item{gene_symbols}{A logical parameter to decide whether to compute additional
 gene gene symbols in case the raw data only contains ENSEMBL gene identifiers.}
 }
+\value{
+Error messages if cases are met
+}
 \description{
-Check package installtion for optional functionalities
+Check package installation for optional functionalities
 }

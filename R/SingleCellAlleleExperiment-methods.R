@@ -20,8 +20,8 @@ NULL
 #' @importMethodsFrom SingleCellExperiment show
 .scae_show <- function(object) {
   n_a_feats <- nrow(scae_subset(object, "alleles"))
-  n_ag_feats <- nrow(get_agenes(object))
-  n_fun_feats <- nrow(scae_subset_functional(object))
+  n_ag_feats <- nrow(scae_subset(object, "immune_genes"))
+  n_fun_feats <- nrow(scae_subset(object, "functional_groups"))
   n_immune_total <- n_a_feats + n_ag_feats + n_fun_feats
 
   callNextMethod()
