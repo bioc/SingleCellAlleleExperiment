@@ -129,27 +129,15 @@ read_allele_counts <- function(samples_dir,
                                verbose=FALSE,
                                BPPARAM=BiocParallel::SerialParam()){
 
+  ## input checks for optional package installation of optional functionalities
   if (filter_mode == "yes"){
     if (!requireNamespace("DropletUtils", quietly=TRUE)) {
       stop("Package 'DropletUtils' needed when using 'filter_mode=\"yes\"'.
-           Install using BiocManager::install(\"DropletUtils\")")
+           Install: BiocManager::install(\"DropletUtils\")")
     }
   }
-
-  if (log){
-    if (!requireNamespace("scuttle", quietly=TRUE)) {
-      stop("Package 'scuttle' needed when using 'log=TRUE'.
-         Install with BiocManager::install(\"scuttle\")")
-    }
-  }
-
-  if (gene_symbols){
-    if (!requireNamespace("org.Hs.eg.db", quietly=TRUE)) {
-      stop("Packages 'org.Hs.eg.db', 'AnnotationDbi' needed when using 'gene_symbols=TRUE'.
-          Install with BiocManager::install(\"org.Hs.eg.db\"),
-          BiocManager::install(\"AnnotationDbi\")")
-    }
-  }
+  ## input checks for optional package installation of optional functionalities
+  check_valid_optional_package(log=log, gene_symbols=gene_symbols)
 
   if (is.null(sample_names)) {
     sample_names <- samples_dir
