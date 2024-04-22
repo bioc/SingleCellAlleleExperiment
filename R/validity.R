@@ -20,7 +20,6 @@ validSingleCellAlleleExperiment <- function(scae_object) {
   if (is.null(msg)) {
     TRUE
   } else msg
-
 }
 
 #' @importFrom S4Vectors setValidity2
@@ -28,12 +27,13 @@ S4Vectors::setValidity2("SingleCellAlleleExperiment",
                         validSingleCellAlleleExperiment)
 
 
-#' Check package installtion for optional functionalities
+#' Check package installation for optional functionalities
 #'
-#' @param log A logical parameter to decide if logcounts assay should be computed
+#' @param log A logical parameter to decide if a logcounts assay should be computed
 #' based on library factors computed with `scuttle::computeLibraryFactors()`.
 #' @param gene_symbols A logical parameter to decide whether to compute additional
 #' gene gene symbols in case the raw data only contains ENSEMBL gene identifiers.
+#' @return Error messages if cases are met
 check_valid_optional_package <- function(log, gene_symbols){
   if (log){
     if (!requireNamespace("scuttle", quietly=TRUE)) {
