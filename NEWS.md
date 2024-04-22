@@ -1,4 +1,4 @@
-
+# SingleCellAlleleExperiment 0.99.5
 
 Changes regarding the second round of comments during the Bioconductor submission
 review:
@@ -7,6 +7,8 @@ review:
 - Extended and moved installation-checks for packages used in optional
 functionalities to the SCAE-constructor
 - Extended checks for the rowData setter
+
+- Extended unit tests to increase coverage
 
 
 # SingleCellAlleleExperiment 0.99.4
