@@ -19,25 +19,23 @@ NULL
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom SingleCellExperiment show
 .scae_show <- function(object) {
-  n_tot_feats <- nrow(object)
-  n_a_feats <- nrow(get_agenes(object))
-  n_ni_feats <- nrow(get_nigenes(object))
-  n_fun_feats <- nrow(scae_subset_functional(object))
+  n_a_feats <- nrow(scae_subset(object, "alleles"))
+  n_ag_feats <- nrow(scae_subset(object, "immune_genes"))
+  n_fun_feats <- nrow(scae_subset(object, "functional_groups"))
+  n_immune_total <- n_a_feats + n_ag_feats + n_fun_feats
 
   callNextMethod()
   cat(
    "---------------\n",
-   "Including a total of ", n_tot_feats, " features:\n",
+   "Including a total of ", n_immune_total, " immune related features:\n",
    sep = ""
   )
-  coolcat("Immune genes (%d): %s\n",
-          rownames(get_agenes(object)))
   coolcat("Allele-level information (%d): %s\n",
           rownames(scae_subset_alleles(object)))
+  coolcat("Immune genes (%d): %s\n",
+          rownames(get_agenes(object)))
   coolcat("Functional level information (%d): %s\n",
           rownames(scae_subset_functional(object)))
-  coolcat("Non-immune genes (%d): %s\n",
-          rownames(get_nigenes(object)))
 }
 
 #' @rdname SingleCellAlleleExperiment-misc

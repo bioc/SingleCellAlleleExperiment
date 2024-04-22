@@ -1,3 +1,14 @@
+
+
+Changes regarding the second round of comments during the Bioconductor submission
+review:
+
+- Minor changes to SCAE-show method
+- Extended and moved installation-checks for packages used in optional
+functionalities to the SCAE-constructor
+- Extended checks for the rowData setter
+
+
 # SingleCellAlleleExperiment 0.99.4
 
 Changes regarding the first round of comments during the Bioconductor submission

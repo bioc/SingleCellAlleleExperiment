@@ -49,6 +49,13 @@ test_that("validty test", {
   expect_error(rowData(scae)$NI_I <- "random_value", regexp="")
   expect_error(rowData(scae)$NI_I <- NULL, regexp="")
   expect_error(rowData(scae)$Quant_type <- "random_value", regexp="")
+  expect_error(rowData(scae) <- "test", regexp="")
+
+  old_scae <- scae
+  rowData(scae) <- NULL
+  retain_cols <- c("NI_I", "Quant_type")
+
+  expect_equal(rowData(old_scae)[,retain_cols], rowData(scae))
 
   ## change 'NI_I' column
   expect_error(colnames(rowData(scae))[2] <- "arbitrary_name")
