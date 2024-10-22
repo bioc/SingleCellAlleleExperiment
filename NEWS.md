@@ -1,3 +1,7 @@
+# SingleCellAlleleExperiment 1.0.1
+
+Updated allele names in the vignette after data package "scaeData" was updated
+
 # SingleCellAlleleExperiment 0.99.5
 
 Changes regarding the second round of comments during the Bioconductor submission
