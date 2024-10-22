@@ -523,13 +523,8 @@ tsne_g_a  <- plotReducedDim(scae, dimred=tsne, colour_by="HLA-DRB1") +
 tsne_g_a1 <- plotReducedDim(scae, dimred=tsne, colour_by="DRB1*07:01:01:01") + 
              ggtitle("Allele DRB1*07:01:01:01")
 
-<<<<<<< HEAD
 tsne_g_a2 <- plotReducedDim(scae, dimred=tsne, colour_by="DRB1*13:01:01:01") + 
              ggtitle("Allele DRB1*13:01:01:01")
-=======
-tsne_g_a2 <- plotReducedDim(scae, dimred=tsne, colour_by="DRB1*13:01:01") + 
-             ggtitle("Allele DRB1*13:01:01")
->>>>>>> 7633712e0f999ccdb8bf4d8c6b210a0ff1f39dd7
 
 p2 <- tsne_g_a + tsne_g_a1 + tsne_g_a2
 p2
