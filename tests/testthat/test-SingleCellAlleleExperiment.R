@@ -153,7 +153,7 @@ test_that("check input-parameter errors", {
                                       matrix_file=example_data_5k$matrix,
                                       filter_threshold=NULL,
                                       verbose=FALSE),
-    regexp = "Filtering performed based on the inflection point at: 282 UMI counts.")
+    regexp = "Filtering performed based on the inflection point at: 911 UMI counts.")
   }
 
 

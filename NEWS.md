@@ -1,3 +1,7 @@
+# SingleCellAlleleExperiment 1.0.2
+
+Fixed error in tests
+
 # SingleCellAlleleExperiment 1.0.1
 
 Updated allele names in the vignette after data package "scaeData" was updated
