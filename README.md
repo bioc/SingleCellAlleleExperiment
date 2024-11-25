@@ -79,6 +79,20 @@ For example, the counts of the alleles `A*01:01:01:01` and `A*02:01:01:01` that 
 
 The resulting `SCAE` data object can be used in combination with established single cell analysis packages like *[scater](https://bioconductor.org/packages/release/bioc/html/scater.html)* and *[scran](https://bioconductor.org/packages/release/bioc/html/scran.html)* to perform downstream analysis on immune gene expression, allowing data exploration on functional and allele level. See the vignette for further information and insights on how to perform downstream analysis using exemplary data from the accompanying `R/Experimenthub` package **[scaeData](https://github.com/AGImkeller/scaeData)**.
 
+## Interoperability with iSEE
+
+You can explore your SingleCellAlleleExperiment object with *[iSEE](https://master.bioconductor.org/packages/release/bioc/html/iSEE.html)*
+
+```markdown
+library(iSEE)
+
+app <- iSEE(scae)
+app
+```
+
+![Interoperability with iSEE](vignettes/iSee_scae.png)
+**Figure 2:** Exploring the data saved in an SingleCellAlleleExperiment object with iSEE.
+
 
 ## Citation
 
