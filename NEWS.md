@@ -1,3 +1,15 @@
+# SingleCellAlleleExperiment 1.3.1
+
+Fixing error in vignette regarding the knee plot in 3.21 devel
+
+# SingleCellAlleleExperiment 1.3.0
+
+No changes, devel version bump due to new bioconductor 3.21 devel branch
+
+# SingleCellAlleleExperiment 1.2.0
+
+Devel version bump due to new bioconductor devel release 3.20
+
 # SingleCellAlleleExperiment 1.0.2
 
 Fixed error in tests
